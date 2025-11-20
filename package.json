@@ -1,0 +1,75 @@
+{
+        "name": "solid-kit",
+        "version": "0.1.0",
+        "description": "Minimal SolidJS flow library",
+        "license": "MIT",
+        "author": "ryusufe",
+        "repository": {
+                "type": "git",
+                "url": "https://github.com/ryusufe/solid-kit.git"
+        },
+        "homepage": "https://github.com/ryusufe/solid-kit#readme",
+        "bugs": {
+                "url": "https://github.com/ryusufe/solid-kit/issues"
+        },
+        "files": [
+                "dist"
+        ],
+        "type": "module",
+        "sideEffects": false,
+        "main": "./dist/index.js",
+        "module": "./dist/index.js",
+        "types": "./dist/index.d.ts",
+        "exports": {
+                ".": {
+                        "solid": "./dist/index.jsx",
+                        "import": {
+                                "types": "./dist/index.d.ts",
+                                "default": "./dist/index.js"
+                        }
+                },
+                "./index.css": "./dist/index.css"
+        },
+        "scripts": {
+                "dev": "vite serve dev",
+                "build": "tsup",
+                "test": "vitest",
+                "prepublishOnly": "npm run build",
+                "build-demo": "vite build dev",
+                "predeploy-demo": "npm run build-demo",
+                "deploy-demo": "gh-pages -d dev/dist"
+        },
+        "peerDependencies": {
+                "solid-js": "^1.6.0"
+        },
+        "devDependencies": {
+                "@types/node": "^20.12.12",
+                "@typescript-eslint/eslint-plugin": "^7.9.0",
+                "@typescript-eslint/parser": "^7.9.0",
+                "concurrently": "^8.2.2",
+                "esbuild": "^0.21.3",
+                "esbuild-plugin-solid": "^0.6.0",
+                "eslint": "^8.56.0",
+                "eslint-plugin-eslint-comments": "^3.2.0",
+                "eslint-plugin-no-only-tests": "^3.1.0",
+                "gh-pages": "^6.3.0",
+                "jsdom": "^24.0.0",
+                "prettier": "3.0.0",
+                "solid-js": "^1.8.17",
+                "tsup": "^8.0.2",
+                "tsup-preset-solid": "^2.2.0",
+                "typescript": "^5.4.5",
+                "vite": "^5.2.11",
+                "vite-plugin-solid": "^2.10.2",
+                "vitest": "^1.6.0"
+        },
+        "keywords": [
+                "solid"
+        ],
+        "engines": {
+                "node": ">=18"
+        },
+        "packageManager": "pnpm@9.1.1",
+        "browser": {},
+        "typesVersions": {}
+}

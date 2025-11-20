@@ -1,0 +1,122 @@
+import { createSignal, type Component } from "solid-js";
+import { SolidKit } from "solid-kit";
+import { ConnectionType, NodeType, ViewPort } from "solid-kit";
+import "./styles.css";
+import { render } from "solid-js/web";
+import NodeToolbar from "./components/NodeToolbar";
+import ConnectionToolbar from "./components/ConnectionToolbar";
+import TopRightQA from "./components/TopRightQA";
+import ExampleMarkdown from "./components/ExampleMarkdown";
+import ExampleStatus from "./components/ExampleStatus";
+// import "solid-kit/index.css";
+
+interface DataType {
+        nodes: NodeType[];
+        connections: ConnectionType[];
+        viewport: ViewPort;
+        gridSize: number;
+}
+
+const App: Component = () => {
+        const [nodes, setNodes] = createSignal<DataType["nodes"]>(
+                DEFAULT.nodes,
+        );
+        const [connections, setConnections] = createSignal<
+                DataType["connections"]
+        >(DEFAULT.connections);
+        const [viewport, setViewport] = createSignal<DataType["viewport"]>(
+                DEFAULT.viewport,
+        );
+
+        const onNodesChange = () => {
+                console.log("nodes changed");
+                // save in db
+        };
+        const onConnectionsChange = () => {
+                console.log("connections changed");
+                // save in db
+        };
+        const onViewportChange = () => {
+                console.log("viewport changed");
+                // save in db
+        };
+
+        return (
+                <div
+                        style={{
+                                background: "#000",
+                                width: "100vw",
+                                height: "100vh",
+                                display: "flex",
+                                "align-items": "center",
+                        }}
+                >
+                        <SolidKit
+                                nodes={nodes()}
+                                onNodesChange={onNodesChange}
+                                connections={connections()}
+                                onConnectionsChange={onConnectionsChange}
+                                viewport={viewport()}
+                                onViewportChange={onViewportChange}
+                                gridSize={DEFAULT.gridSize}
+                                components={{
+                                        "node-toolbar": NodeToolbar,
+                                        "connection-toolbar": ConnectionToolbar,
+                                        "example-markdown": ExampleMarkdown,
+                                        "example-status": ExampleStatus,
+                                }}
+                        >
+                                <TopRightQA />
+                        </SolidKit>
+                </div>
+        );
+};
+
+const DEFAULT: DataType = {
+        nodes: [
+                {
+                        id: "node-1",
+                        x: 390,
+                        y: 300,
+                        width: 210,
+                        height: 300,
+                        data: {
+                                label: "Outline Changer",
+                                component: { type: "example-status" },
+                        },
+                        style: { "outline-color": "#272727" },
+                },
+                {
+                        id: "node-2",
+                        x: 120,
+                        y: 120,
+                        width: 150,
+                        height: 60,
+                        data: { label: "Process A" },
+                },
+                {
+                        id: "node-3",
+                        x: 870,
+                        y: 150,
+                        width: 600,
+                        height: 720,
+                        data: {
+                                label: "Example markdown",
+                                component: { type: "example-markdown" },
+                        },
+                },
+        ],
+
+        connections: [
+                {
+                        id: "connection-1",
+                        from: { id: "node-1", side: "left" },
+                        to: { id: "node-2", side: "right" },
+                        label: "Next",
+                },
+        ],
+        viewport: { x: 0, y: 0, zoom: 1 },
+        gridSize: 30,
+};
+
+render(() => <App />, document.getElementById("root")!);

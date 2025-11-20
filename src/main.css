@@ -1,0 +1,292 @@
+.solid-kit {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        background-color: var(--bg-color, #F7F9FB);
+        background-image: radial-gradient(circle, var(--dots-color, #cccccc) var(--bg-vp-zoom), transparent 1px);
+
+        .container {
+                transform-origin: 0 0;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+
+                .node {
+                        background: var(--node-bg, #FFFFFF);
+                        outline-width: var(--node-outline-width, 2px);
+                        outline-style: var(--node-outline-style, solid);
+                        outline-color: var(--node-outline-color, #ebebeb);
+                        /* box-sizing: border-box; */
+                        position: absolute;
+                        color: var(--node-color, black);
+                        border-radius: var(--node-radius, 10px);
+                        padding: var(--node-padding, 0px);
+                        box-shadow: var(--node-shadow, 0 2px 5px rgba(0, 0, 0, 0.1));
+                        font-size: var(--node-font-size, 14px);
+                        font-family: var(--node-font-family, sans-serif);
+                        cursor: var(--node-cursor, default);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        transition: all 0.1s;
+
+                        .node-edge {
+                                --off-v: -7px;
+                                position: absolute;
+                                z-index: 1;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+
+                                &:hover {
+                                        .node-handle {
+                                                --opacity: 1;
+                                        }
+                                }
+
+                        }
+
+                        .node-handle {
+                                opacity: var(--opacity, 0);
+                                background-color: var(--node-bg, #f2f2f2);
+                                border: 2px solid var(--node-handle-border, #b0b0b0);
+                                width: 10px;
+                                height: 10px;
+                                position: absolute;
+                                border-radius: 100%;
+                                transition: opacity 0.1s;
+
+                                &:hover {
+                                        cursor: crosshair;
+                                }
+                        }
+                }
+
+                .node:hover {
+                        outline-color: var(--node-outline, #DBDBDB);
+                }
+
+                .node.selected {
+                        outline-color: var(--node-outline, #1a73e8);
+                }
+
+                .connection {
+                        stroke: var(--connection-color, #b1b1b8);
+                        stroke-width: var(--connection-width, 2);
+
+                        &:hover {
+                                stroke: var(--connection-color, #1a73e8);
+                        }
+                }
+
+                .connection.selected {
+                        stroke: var(--connection-outline, #1a73e8);
+                }
+
+                .connection-preview {
+                        stroke: var(--connection-color, #b1b1b8);
+
+                        & circle {
+                                fill: var(--connection-color, #b1b1b8);
+                        }
+                }
+
+
+                .connection-label {
+                        color: var(--label-color, black);
+                        background-color: var(--bg-color, #F7F9FB);
+                        padding-inline: 2px;
+                }
+        }
+
+        .kit-controls {
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                display: flex;
+                flex-direction: var(--flex-direction, column);
+                gap: 1px;
+                z-index: 10;
+                background: var(--controls-bg, #ebebeb);
+                border-radius: 0.3rem;
+                box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.2);
+                overflow: hidden;
+
+                & button {
+                        background: var(--controls-button-bg, #ffffff);
+                        /* border-radius: 0.4rem; */
+                        border: 0;
+                        cursor: pointer;
+                        padding: 0.4em;
+                        width: 2em;
+                        height: 2em;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+
+                        &:hover {
+                                background-color: var(--node-outline, #DBDBDB);
+                        }
+
+                        & svg {
+                                color: var(--color, black);
+                                width: 1.5em;
+                                height: 1.5em;
+                        }
+
+                        &.on {
+                                background-color: var(--controls-button-bg, #1a73e8);
+
+                                & svg {
+                                        fill: var(--color, white);
+                                }
+                        }
+                }
+
+        }
+}
+
+.dark .solid-kit {
+        background-color: var(--bg-color, #121212);
+        background-image: radial-gradient(circle, var(--dots-color, #2e2e2e) var(--bg-vp-zoom), transparent 1px);
+
+        .container {
+                transform-origin: 0 0;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+
+                .node {
+                        background: var(--node-bg, #212121);
+                        outline-width: var(--node-outline-width, 2px);
+                        outline-style: var(--node-outline-style, solid);
+                        outline-color: var(--node-outline-color, #3d3d3d);
+                        position: absolute;
+                        color: var(--node-color, #ffffff);
+                        border-radius: var(--node-radius, 10px);
+                        padding: var(--node-padding, 0px);
+                        box-shadow: var(--node-shadow, 0 2px 5px rgba(0, 0, 0, 0.2));
+                        font-size: var(--node-font-size, 14px);
+                        font-family: var(--node-font-family, sans-serif);
+                        cursor: var(--node-cursor, default);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        transition: all 0.1s;
+
+                        .node-edge {
+                                --off-v: -7px;
+                                position: absolute;
+                                z-index: 1;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+
+                                &:hover {
+                                        .node-handle {
+                                                --opacity: 1;
+                                        }
+                                }
+                        }
+
+                        .node-handle {
+                                opacity: var(--opacity, 0);
+                                background-color: var(--node-bg, #212121);
+                                border: 2px solid var(--node-handle-border, #595858);
+                                width: 10px;
+                                height: 10px;
+                                position: absolute;
+                                border-radius: 100%;
+                                transition: opacity 0.1s;
+
+                                &:hover {
+                                        cursor: crosshair;
+                                }
+                        }
+                }
+
+                .node:hover {
+                        outline-color: var(--node-outline, #595858);
+                }
+
+                .node.selected {
+                        outline-color: var(--node-outline, #4287f5);
+                }
+
+                .connection {
+                        stroke: var(--connection-color, #464647);
+                        stroke-width: var(--connection-width, 2);
+
+                        &:hover {
+                                stroke: var(--connection-color, #4287f5);
+                        }
+                }
+
+                .connection.selected {
+                        stroke: var(--connection-outline, #4287f5);
+                }
+
+                .connection-preview {
+                        stroke: var(--connection-color, #464647);
+
+                        & circle {
+                                fill: var(--connection-color, #464647);
+                        }
+                }
+
+                .connection-label {
+                        color: var(--label-color, #ffffff);
+                        background-color: var(--bg-color, #121212);
+                        padding-inline: 2px;
+                }
+        }
+
+        .kit-controls {
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                display: flex;
+                flex-direction: var(--flex-direction, column);
+                gap: 1px;
+                z-index: 10;
+                background: var(--controls-bg, #2b2b2b);
+                border-radius: 0.3rem;
+                box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.6);
+                overflow: hidden;
+
+                & button {
+                        background: var(--controls-button-bg, #333333);
+                        border: 0;
+                        cursor: pointer;
+                        padding: 0.4em;
+                        width: 2em;
+                        height: 2em;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+
+                        &:hover {
+                                background-color: var(--node-outline, #595858);
+                        }
+
+                        & svg {
+                                color: var(--color, white);
+                                width: 1.5em;
+                                height: 1.5em;
+                        }
+
+                        &.on {
+                                background-color: var(--controls-button-bg, #4287f5);
+
+                                & svg {
+                                        fill: var(--color, white);
+                                }
+                        }
+                }
+        }
+}

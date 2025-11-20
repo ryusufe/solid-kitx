@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "solid-kit": ["../src/"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}
+
