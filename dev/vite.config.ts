@@ -8,7 +8,7 @@ export default defineConfig({
                         "solid-kit": path.resolve(__dirname, "../src"),
                 },
         },
-        base: "solid-kit",
+        base: "/solid-kit/",
         plugins: [
                 solidPlugin(),
                 {

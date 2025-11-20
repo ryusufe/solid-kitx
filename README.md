@@ -3,7 +3,12 @@
 ![Solid Kit Banner](https://github.com/ryusufe/solid-kit/raw/main/assets/banner.png)
 
 A minimal, lightweight, and highly customizable node-based graph library for solidjs. Built with performance and flexibility in mind.
+<a style="font-size:2em" href="https://ryusufe.github.io/solid-kit/">✨DEMO</a>
 
+
+```bash
+npm install solid-kit
+```
 
 ## Basic Usage
 
