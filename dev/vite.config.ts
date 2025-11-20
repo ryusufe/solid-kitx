@@ -5,10 +5,10 @@ import solidPlugin from "vite-plugin-solid";
 export default defineConfig({
         resolve: {
                 alias: {
-                        "solid-kit": path.resolve(__dirname, "../src"),
+                        "solid-kitx": path.resolve(__dirname, "../src"),
                 },
         },
-        base: "/solid-kit/",
+        base: "/solid-kitx/",
         plugins: [
                 solidPlugin(),
                 {
