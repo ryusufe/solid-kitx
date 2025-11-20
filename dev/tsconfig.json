@@ -4,7 +4,7 @@
     "types": ["vite/client"],
     "baseUrl": ".",
     "paths": {
-      "solid-kit": ["../src/"]
+      "solid-kitx": ["../src/"]
     }
   },
   "exclude": ["node_modules", "dist"]

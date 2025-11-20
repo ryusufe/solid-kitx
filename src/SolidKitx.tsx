@@ -36,7 +36,7 @@ interface SolidKitProps {
         children?: JSX.Element | ((kit: Kit) => JSX.Element);
         components?: ComponentsType;
 }
-export const SolidKit = ({ gridSize = 30, ...props }: SolidKitProps) => {
+export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         const kit = createKit({ ...props, gridSize });
 
         createEffect(() => {
@@ -154,7 +154,7 @@ export const SolidKit = ({ gridSize = 30, ...props }: SolidKitProps) => {
                 <KitContext.Provider value={kit}>
                         <div
                                 ref={containerRef}
-                                class="solid-kit"
+                                class="solid-kitx"
                                 style={{
                                         "--bg-vp-zoom": `${vp().zoom * 1.2}px`,
                                         "background-size": `${

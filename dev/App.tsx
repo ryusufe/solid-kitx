@@ -1,6 +1,6 @@
 import { createSignal, type Component } from "solid-js";
-import { SolidKit } from "solid-kit";
-import { ConnectionType, NodeType, ViewPort } from "solid-kit";
+import { SolidKitx } from "solid-kitx";
+import { ConnectionType, NodeType, ViewPort } from "solid-kitx";
 import "./styles.css";
 import { render } from "solid-js/web";
 import NodeToolbar from "./components/NodeToolbar";
@@ -8,7 +8,7 @@ import ConnectionToolbar from "./components/ConnectionToolbar";
 import TopRightQA from "./components/TopRightQA";
 import ExampleMarkdown from "./components/ExampleMarkdown";
 import ExampleStatus from "./components/ExampleStatus";
-// import "solid-kit/index.css";
+import "solid-kitx/index.css";
 
 interface DataType {
         nodes: NodeType[];
@@ -51,7 +51,7 @@ const App: Component = () => {
                                 "align-items": "center",
                         }}
                 >
-                        <SolidKit
+                        <SolidKitx
                                 nodes={nodes()}
                                 onNodesChange={onNodesChange}
                                 connections={connections()}
@@ -67,7 +67,7 @@ const App: Component = () => {
                                 }}
                         >
                                 <TopRightQA />
-                        </SolidKit>
+                        </SolidKitx>
                 </div>
         );
 };
@@ -92,7 +92,7 @@ const DEFAULT: DataType = {
                         y: 120,
                         width: 150,
                         height: 60,
-                        data: { label: "Process A" },
+                        data: { label: "Node A" },
                 },
                 {
                         id: "node-3",

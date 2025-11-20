@@ -1,4 +1,4 @@
-import { Kit, NodeType } from "solid-kit";
+import { Kit, NodeType } from "solid-kitx";
 
 const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
         const changeOutlineColor = () => {

@@ -1,4 +1,4 @@
-.solid-kit {
+.solid-kitx {
         width: 100%;
         height: 100%;
         overflow: hidden;
@@ -149,7 +149,7 @@
         }
 }
 
-.dark .solid-kit {
+.dark .solid-kitx {
         background-color: var(--bg-color, #121212);
         background-image: radial-gradient(circle, var(--dots-color, #2e2e2e) var(--bg-vp-zoom), transparent 1px);
 

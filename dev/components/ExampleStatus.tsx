@@ -1,5 +1,5 @@
 import { Component, createMemo, For } from "solid-js";
-import { Kit, NodeType } from "solid-kit";
+import { Kit, NodeType } from "solid-kitx";
 const colors = [
         "#fee440",
         "#00f6ed",

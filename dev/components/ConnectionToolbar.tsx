@@ -1,4 +1,4 @@
-import { ConnectionType, Kit, NodeType } from "solid-kit";
+import { ConnectionType, Kit, NodeType } from "solid-kitx";
 
 const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
         const changeLineColor = () => {

@@ -1,5 +1,5 @@
 import "./main.css";
-export { SolidKit } from "./SolidKit";
+export { SolidKitx } from "./SolidKitx";
 export type {
         NodeType,
         ConnectionType,

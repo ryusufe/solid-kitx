@@ -1,16 +1,16 @@
 {
-        "name": "solid-kit",
+        "name": "solid-kitx",
         "version": "0.1.0",
         "description": "Minimal SolidJS flow library",
         "license": "MIT",
         "author": "ryusufe",
         "repository": {
                 "type": "git",
-                "url": "https://github.com/ryusufe/solid-kit.git"
+                "url": "https://github.com/ryusufe/solid-kitx.git"
         },
-        "homepage": "https://github.com/ryusufe/solid-kit#readme",
+        "homepage": "https://github.com/ryusufe/solid-kitx#readme",
         "bugs": {
-                "url": "https://github.com/ryusufe/solid-kit/issues"
+                "url": "https://github.com/ryusufe/solid-kitx/issues"
         },
         "files": [
                 "dist"
