@@ -1,10 +1,16 @@
-# Solid Kit
+# Solid Kitx
 
 ![Solid Kit Banner](https://github.com/ryusufe/solid-kitx/raw/main/assets/banner.png)
 
 A minimal, lightweight, and highly customizable node-based graph library for solidjs. Built with performance and flexibility in mind.
-<a style="font-size:2em" href="https://ryusufe.github.io/solid-kitx/">✨DEMO</a>
 
+<div align="center" style="font-size:2em;">
+<a  href="https://github.com/ryusufe/solid-kitx/wiki">📖Wiki</a>
+<a href="https://ryusufe.github.io/solid-kitx/">✨DEMO</a>
+<a  href="https://buymeacoffee.com/ryusufe">💖Support</a>
+</div>
+
+---
 
 ```bash
 npm install solid-kitx
@@ -15,7 +21,7 @@ npm install solid-kitx
 
 ```tsx
 import { createSignal, Component } from "solid-js";
-import { SolidKit, ConnectionType, NodeType, ViewPort } from "solid-kitx";
+import { SolidKitx, ConnectionType, NodeType, ViewPort } from "solid-kitx";
 import "solid-kitx/index.css";
 
 const App: Component = () => {
@@ -50,7 +56,7 @@ const App: Component = () => {
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <SolidKit
+      <SolidKitx
         nodes={nodes()}
         connections={connections()}
         viewport={viewport()}
@@ -66,3 +72,4 @@ export default App;
 ```
 
 - [Read the wiki](https://github.com/ryusufe/solid-kitx/wiki)
+
