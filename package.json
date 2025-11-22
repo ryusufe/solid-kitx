@@ -1,6 +1,6 @@
 {
         "name": "solid-kitx",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "description": "Minimal SolidJS flow library",
         "license": "MIT",
         "author": "ryusufe",
