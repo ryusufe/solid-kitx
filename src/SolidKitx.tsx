@@ -39,15 +39,16 @@ interface SolidKitProps {
 export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         const kit = createKit({ ...props, gridSize });
 
-        createEffect(() => {
-                if (props.nodes) kit.setNodes(props.nodes);
-        });
-        createEffect(() => {
-                if (props.connections) kit.setConnections(props.connections);
-        });
-        createEffect(() => {
-                if (props.viewport) kit.setViewport(props.viewport);
-        });
+        // it's better to control these values using kit obj
+        // createEffect(() => {
+        //         if (props.nodes) kit.setNodes(props.nodes);
+        // });
+        // createEffect(() => {
+        //         if (props.connections) kit.setConnections(props.connections);
+        // });
+        // createEffect(() => {
+        //         if (props.viewport) kit.setViewport(props.viewport);
+        // });
 
         const attachMouseMove = (e: MouseEvent) => {
                 const prev = kit.viewport();
@@ -135,6 +136,136 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         kit.updateConnections();
                 }
         };
+        ///
+        let touchCache: Touch[] = [];
+        let pinchStartDist = 0;
+        let pinchStartZoom = 1;
+        let initialViewport = { x: 0, y: 0, zoom: 1 };
+
+        const getDistance = (touches: TouchList) => {
+                const [t1, t2] = touches;
+                if (!t1 || !t2) return 0;
+                return Math.hypot(
+                        t1.clientX - t2.clientX,
+                        t1.clientY - t2.clientY,
+                );
+        };
+
+        const onTouchStart = (
+                e: TouchEvent & { currentTarget: HTMLDivElement },
+        ) => {
+                if (kit.focus()) return;
+                if ((e.target as HTMLElement).closest(".node")) return;
+
+                if (e.touches.length > 1) {
+                        e.preventDefault();
+                }
+
+                initialViewport = kit.viewport();
+
+                touchCache = Array.from(e.touches);
+
+                if (e.touches.length === 2) {
+                        pinchStartDist = getDistance(e.touches);
+                        pinchStartZoom = initialViewport.zoom;
+                }
+
+                window.addEventListener("touchmove", onTouchMove, {
+                        passive: false,
+                });
+                window.addEventListener("touchend", onTouchEnd, { once: true });
+                window.addEventListener("touchcancel", onTouchEnd, {
+                        once: true,
+                });
+        };
+
+        const onTouchMove = (e: TouchEvent) => {
+                const currentTouches = Array.from(e.touches);
+                const touchCount = currentTouches.length;
+
+                if (touchCount === 2) {
+                        e.preventDefault();
+
+                        const dist = getDistance(e.touches);
+                        const scale = dist / pinchStartDist;
+
+                        const zoom = Math.max(
+                                0.1,
+                                Math.min(5, pinchStartZoom * scale),
+                        );
+
+                        const rect = (
+                                e.currentTarget as HTMLDivElement
+                        ).getBoundingClientRect();
+                        const centerX =
+                                (currentTouches[0]!.clientX +
+                                        currentTouches[1]!.clientX) /
+                                2;
+                        const centerY =
+                                (currentTouches[0]!.clientY +
+                                        currentTouches[1]!.clientY) /
+                                2;
+
+                        const cursorX = centerX - rect.left;
+                        const cursorY = centerY - rect.top;
+
+                        const x =
+                                cursorX -
+                                (cursorX - initialViewport.x) *
+                                        (zoom / initialViewport.zoom);
+                        const y =
+                                cursorY -
+                                (cursorY - initialViewport.y) *
+                                        (zoom / initialViewport.zoom);
+                        kit.setViewport({
+                                zoom,
+                                x,
+                                y,
+                        });
+
+                        return;
+                }
+
+                if (touchCount === 1) {
+                        e.preventDefault();
+
+                        const currentTouch = currentTouches[0];
+                        const previousTouch = touchCache[0];
+
+                        if (previousTouch) {
+                                const dx =
+                                        currentTouch!.clientX -
+                                        previousTouch.clientX;
+                                const dy =
+                                        currentTouch!.clientY -
+                                        previousTouch.clientY;
+
+                                const prev = kit.viewport();
+                                kit.setViewport({
+                                        ...prev,
+                                        x: prev.x + dx,
+                                        y: prev.y + dy,
+                                });
+                        }
+                }
+
+                touchCache = currentTouches;
+        };
+
+        const onTouchEnd = () => {
+                if (kit.viewport() !== initialViewport) {
+                        kit.updateViewport();
+                        // alert("updated vp");
+                }
+
+                window.removeEventListener("touchmove", onTouchMove);
+                window.removeEventListener("touchend", onTouchEnd);
+                window.removeEventListener("touchcancel", onTouchEnd);
+
+                touchCache = [];
+                pinchStartDist = 0;
+                pinchStartZoom = 1;
+        };
 
         onMount(() => {
                 window.addEventListener("scrollend", onScrollEnd);
@@ -148,6 +279,8 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                 window.removeEventListener("mousemove", attachMouseMove);
                 window.removeEventListener("resize", updateRect);
                 window.removeEventListener("keydown", onKeyDown);
+                //
+                window.removeEventListener("touchmove", onTouchMove);
         });
 
         return (
@@ -167,6 +300,8 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                 }}
                                 onmousedown={onMouseDown}
                                 onwheel={onWheel}
+                                ontouchstart={onTouchStart}
+                                ontouchmove={(e) => e.preventDefault()}
                         >
                                 <div
                                         class="container"

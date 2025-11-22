@@ -1,4 +1,4 @@
-import { Kit, NodeType } from "solid-kitx";
+import { ConnectionType, Kit, NodeType } from "solid-kitx";
 
 const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
         const changeOutlineColor = () => {
@@ -28,8 +28,14 @@ const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
         };
 
         const removeNode = () => {
+                const n_id = props.node.id;
+                props.kit.setConnections((prev: ConnectionType[]) =>
+                        prev.filter(
+                                (c) => c.from.id !== n_id && c.to.id !== n_id,
+                        ),
+                );
                 props.kit.setNodes((prev: NodeType[]) =>
-                        prev.filter((n) => n.id !== props.node.id),
+                        prev.filter((n) => n.id !== n_id),
                 );
                 props.kit.updateNodes();
         };

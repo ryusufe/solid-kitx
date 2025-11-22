@@ -117,6 +117,58 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                         window.removeEventListener("keydown", onKeyDown);
                 }
         };
+        //
+        const onTouchStart = (
+                e: TouchEvent & { currentTarget: HTMLDivElement },
+        ) => {
+                if (e.touches.length !== 1) return;
+
+                setSelected(true);
+                if (kit.focus()) {
+                        e.stopPropagation();
+                        return;
+                }
+                e.preventDefault();
+                dragging = true;
+
+                startMouse = {
+                        x: e.touches[0]!.clientX,
+                        y: e.touches[0]!.clientY,
+                };
+
+                const { x, y, ..._ } = node;
+                startPos = { x, y };
+
+                window.addEventListener("touchmove", onTouchMove, {
+                        signal: controller.signal,
+                });
+                window.addEventListener("touchend", onTouchEnd, {
+                        once: true,
+                        signal: controller.signal,
+                });
+        };
+
+        const onTouchMove = (e: TouchEvent) => {
+                if (!dragging || e.touches.length !== 1) return;
+
+                const zoom = kit.viewport().zoom;
+
+                const dx = (e.touches[0]!.clientX - startMouse.x) / zoom;
+                const dy = (e.touches[0]!.clientY - startMouse.y) / zoom;
+
+                const x = startPos.x + Math.round(dx / gridSize()) * gridSize();
+                const y = startPos.y + Math.round(dy / gridSize()) * gridSize();
+
+                kit.setNodes((n: NodeType) => n.id === node.id, { x, y });
+        };
+
+        const onTouchEnd = () => {
+                dragging = false;
+                if (startPos.x !== node.x || startPos.y !== node.y) {
+                        kit.updateNodes();
+                }
+                window.removeEventListener("touchmove", onTouchMove);
+        };
 
         onCleanup(() => {
                 controller.abort();
@@ -130,6 +182,7 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                         id={node.id}
                         tabIndex={"0"}
                         onmousedown={onMouseDown}
+                        ontouchstart={onTouchStart}
                         style={{
                                 left: `${node.x}px`,
                                 top: `${node.y}px`,

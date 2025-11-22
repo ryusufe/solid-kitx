@@ -63,6 +63,10 @@
                                         cursor: crosshair;
                                 }
                         }
+
+                        .node-handle.visible {
+                                --opacity: 1;
+                        }
                 }
 
                 .node:hover {

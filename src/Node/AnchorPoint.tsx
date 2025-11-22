@@ -1,4 +1,4 @@
-import { Component } from "solid-js";
+import { Component, createSignal } from "solid-js";
 import { ConnectionType, NodeType, Position, Kit } from "src/types";
 
 const sides: Position[] = ["left", "right", "top", "bottom"];
@@ -8,15 +8,9 @@ const AnchorPoint: Component<{
         kit: Kit;
         id: string;
 }> = (props) => {
-        const onMouseDown = (e: MouseEvent) => {
-                e.stopPropagation();
-                document.documentElement.style.userSelect = "none";
-                props.kit.activeConnection = {
-                        from: {
-                                side: props.side,
-                                id: props.id,
-                        },
-                };
+        const onMouseMove = (e: MouseEvent) => {
+                if (!props.kit.activeConnection.from) return;
+
                 const { x, y, zoom } = props.kit.viewport();
                 const rect = props.kit.containerRect;
                 if (!rect) return;
@@ -25,28 +19,30 @@ const AnchorPoint: Component<{
                         x: (e.clientX - rect.left - x) / zoom,
                         y: (e.clientY - rect.top - y) / zoom,
                 });
-                window.addEventListener("mouseup", onMouseUp, { once: true });
         };
-        const onMouseUp = () => {
+
+        const onUp = () => {
                 const kit = props.kit;
                 if (kit.activeConnection.from) {
-                        const id = kit.randomId("node");
                         let to = kit.activeConnection.to;
                         if (!to) {
                                 const dest = kit.activeConnectionDestination();
                                 if (dest) {
+                                        const id = kit.randomId("node");
                                         const node: NodeType = {
                                                 id,
                                                 x:
                                                         Math.round(
                                                                 dest.x /
-                                                                        kit.gridSize(),
-                                                        ) * kit.gridSize(),
+                                                                        props.kit.gridSize(),
+                                                        ) *
+                                                        props.kit.gridSize(),
                                                 y:
                                                         Math.round(
                                                                 dest.y /
-                                                                        kit.gridSize(),
-                                                        ) * kit.gridSize(),
+                                                                        props.kit.gridSize(),
+                                                        ) *
+                                                        props.kit.gridSize(),
                                                 width: 5 * kit.gridSize(),
                                                 height: 2 * kit.gridSize(),
                                                 data: {
@@ -82,12 +78,73 @@ const AnchorPoint: Component<{
                         }
                 }
 
+                cleanupConnection();
+        };
+
+        const startConnection = (clientX: number, clientY: number) => {
+                document.documentElement.style.userSelect = "none";
+                props.kit.activeConnection = {
+                        from: {
+                                side: props.side,
+                                id: props.id,
+                        },
+                };
+                const { x, y, zoom } = props.kit.viewport();
+                const rect = props.kit.containerRect;
+                if (!rect) return;
+                props.kit.setActiveConnectionDestination({
+                        x: (clientX - rect.left - x) / zoom,
+                        y: (clientY - rect.top - y) / zoom,
+                });
+        };
+
+        const onMouseDown = (e: MouseEvent) => {
+                e.stopPropagation();
+                startConnection(e.clientX, e.clientY);
+                window.addEventListener("mousemove", onMouseMove);
+                window.addEventListener("mouseup", onUp, { once: true });
+        };
+
+        const onTouchStart = (e: TouchEvent) => {
+                e.stopPropagation();
+                if (e.touches.length !== 1) return;
+                e.preventDefault();
+                startConnection(e.touches[0]!.clientX, e.touches[0]!.clientY);
+                window.addEventListener("touchmove", onTouchMove);
+                window.addEventListener("touchend", onUp, { once: true });
+        };
+
+        const onTouchMove = (e: TouchEvent) => {
+                if (e.touches.length !== 1 || !props.kit.activeConnection.from)
+                        return;
+
+                e.preventDefault();
+
+                const { x, y, zoom } = props.kit.viewport();
+                const rect = props.kit.containerRect;
+                if (!rect) return;
+
+                props.kit.setActiveConnectionDestination({
+                        x: (e.touches[0]!.clientX - rect.left - x) / zoom,
+                        y: (e.touches[0]!.clientY - rect.top - y) / zoom,
+                });
+        };
+
+        const cleanupConnection = () => {
                 document.documentElement.style.userSelect = "auto";
                 props.kit.setActiveConnectionDestination(null);
                 props.kit.activeConnection = {};
+                window.removeEventListener("mousemove", onMouseMove);
+                window.removeEventListener("touchmove", onTouchMove);
         };
 
-        return <div class="node-handle" onMouseDown={onMouseDown}></div>;
+        return (
+                <div
+                        class="node-handle"
+                        onMouseDown={onMouseDown}
+                        ontouchstart={onTouchStart}
+                ></div>
+        );
 };
 
 export default AnchorPoint;
