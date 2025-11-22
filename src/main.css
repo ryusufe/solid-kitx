@@ -42,17 +42,17 @@
                                 align-items: center;
 
                                 &:hover {
-                                        .node-handle {
+                                        .node-anchor {
                                                 --opacity: 1;
                                         }
                                 }
 
                         }
 
-                        .node-handle {
+                        .node-anchor {
                                 opacity: var(--opacity, 0);
                                 background-color: var(--node-bg, #f2f2f2);
-                                border: 2px solid var(--node-handle-border, #b0b0b0);
+                                border: 2px solid var(--node-anchor-border, #b0b0b0);
                                 width: 10px;
                                 height: 10px;
                                 position: absolute;
@@ -64,7 +64,7 @@
                                 }
                         }
 
-                        .node-handle.visible {
+                        .node-anchor.visible {
                                 --opacity: 1;
                         }
                 }
@@ -151,6 +151,12 @@
                 }
 
         }
+
+        @media (max-width: 600px) {
+                .node:focus .node-anchor {
+                        --opacity: 0.5;
+                }
+        }
 }
 
 .dark .solid-kitx {
@@ -192,16 +198,16 @@
                                 align-items: center;
 
                                 &:hover {
-                                        .node-handle {
+                                        .node-anchor {
                                                 --opacity: 1;
                                         }
                                 }
                         }
 
-                        .node-handle {
+                        .node-anchor {
                                 opacity: var(--opacity, 0);
                                 background-color: var(--node-bg, #212121);
-                                border: 2px solid var(--node-handle-border, #595858);
+                                border: 2px solid var(--node-anchor-border, #595858);
                                 width: 10px;
                                 height: 10px;
                                 position: absolute;

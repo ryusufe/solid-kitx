@@ -182,7 +182,7 @@ const AnchorPoint: Component<{
         return (
                 <div
                         ref={anchorRef}
-                        class="node-handle"
+                        class="node-anchor"
                         onMouseDown={onMouseDown}
                         ontouchstart={onTouchStart}
                 ></div>

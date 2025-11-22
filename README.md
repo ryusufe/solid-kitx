@@ -1,8 +1,6 @@
-# Solid Kitx
-
 ![Solid Kit Banner](https://github.com/ryusufe/solid-kitx/raw/main/assets/banner.png)
 
-A minimal, lightweight, and highly customizable node-based graph library for solidjs. Built with performance and flexibility in mind.
+A minimal, lightweight, and highly customizable node-based editor library for SolidJS. Built with performance and flexibility in mind.
 
 <div align="center" style="font-size:2em;">
 <a  href="https://github.com/ryusufe/solid-kitx/wiki">📖Wiki</a>
@@ -72,4 +70,3 @@ export default App;
 ```
 
 - [Read the wiki](https://github.com/ryusufe/solid-kitx/wiki)
-
