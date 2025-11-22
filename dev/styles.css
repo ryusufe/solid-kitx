@@ -36,6 +36,8 @@ code {
         font-family: Arial, sans-serif;
         font-size: 14px;
         z-index: 1000;
+        max-height: 80vh;
+        overflow-y: auto;
 
         button {
                 background-color: transparent;
@@ -47,14 +49,13 @@ code {
                 justify-content: center;
                 align-items: center;
                 border-radius: 6px;
-
-
         }
+
 }
 
 .instructions-title {
-        margin: 0 0 8px 0;
         font-size: 16px;
+        margin-block: auto;
         text-align: center;
 }
 
@@ -62,6 +63,7 @@ code {
         padding: 0;
         margin: 0;
         list-style: none;
+        margin-top: 10px;
 }
 
 .instructions-question {
@@ -111,4 +113,31 @@ code {
         background-color: #242424;
         border-left: 3px solid #4287f5;
         color: #f0f0f0;
+}
+
+.instructions-popup.open {
+        max-height: fit-content;
+        height: auto;
+        overflow: visible;
+}
+
+@media (max-width: 600px) {
+        .instructions-popup {
+                right: 10px;
+                left: 10px;
+                width: auto;
+                top: 10px;
+                padding: 10px;
+                font-size: 13px;
+                max-height: 60vh;
+        }
+
+        .instructions-popup.open {
+                max-height: fit-content;
+                height: auto;
+        }
+
+        .instructions-question {
+                padding: 10px;
+        }
 }

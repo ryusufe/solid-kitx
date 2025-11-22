@@ -8,7 +8,7 @@ import ConnectionToolbar from "./components/ConnectionToolbar";
 import TopRightQA from "./components/TopRightQA";
 import ExampleMarkdown from "./components/ExampleMarkdown";
 import ExampleStatus from "./components/ExampleStatus";
-// import "solid-kitx/index.css";
+//import "solid-kitx/index.css";
 
 interface DataType {
         nodes: NodeType[];

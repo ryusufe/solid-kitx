@@ -145,7 +145,7 @@
                                 background-color: var(--controls-button-bg, #1a73e8);
 
                                 & svg {
-                                        fill: var(--color, white);
+                                        color: var(--color, white);
                                 }
                         }
                 }

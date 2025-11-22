@@ -1,6 +1,7 @@
-import { Accessor, Component, createMemo, Show } from "solid-js";
+import { Component, createMemo, Show } from "solid-js";
 import { Kit, NodeType, Position } from "src/types";
 import AnchorPoint from "./AnchorPoint";
+import { createDragHandler, calculateDelta } from "../lib/eventUtils";
 
 export type EdgePosition = Position | "tr" | "tl" | "br" | "bl";
 
@@ -49,25 +50,25 @@ const Edge: Component<{
         const cornerAxes =
                 props.side === "tl"
                         ? [
-                                  { axis: "x", sign: -1 },
-                                  { axis: "y", sign: -1 },
-                          ]
+                                { axis: "x", sign: -1 },
+                                { axis: "y", sign: -1 },
+                        ]
                         : props.side === "tr"
-                        ? [
-                                  { axis: "x", sign: 1 },
-                                  { axis: "y", sign: -1 },
-                          ]
-                        : props.side === "bl"
-                        ? [
-                                  { axis: "x", sign: -1 },
-                                  { axis: "y", sign: 1 },
-                          ]
-                        : props.side === "br"
-                        ? [
-                                  { axis: "x", sign: 1 },
-                                  { axis: "y", sign: 1 },
-                          ]
-                        : [];
+                                ? [
+                                        { axis: "x", sign: 1 },
+                                        { axis: "y", sign: -1 },
+                                ]
+                                : props.side === "bl"
+                                        ? [
+                                                { axis: "x", sign: -1 },
+                                                { axis: "y", sign: 1 },
+                                        ]
+                                        : props.side === "br"
+                                                ? [
+                                                        { axis: "x", sign: 1 },
+                                                        { axis: "y", sign: 1 },
+                                                ]
+                                                : [];
 
         const axes = isCorner ? cornerAxes : [single];
 
@@ -75,115 +76,132 @@ const Edge: Component<{
                 ? props.side === "tl" || props.side === "br"
                         ? "nwse-resize"
                         : "nesw-resize"
-                : single.cursor;
+                : single?.cursor ?? "default";
 
         const size = createMemo(() => {
                 const thickness = "calc(var(--node-border-width, 2px) + 10px)";
 
                 return isCorner
                         ? {
-                                  width: thickness,
-                                  height: thickness,
-                                  cursor,
-                          }
+                                width: thickness,
+                                height: thickness,
+                                cursor,
+                        }
                         : {
-                                  width:
-                                          single.axis === "y"
-                                                  ? "100%"
-                                                  : thickness,
-                                  height:
-                                          single.axis === "y"
-                                                  ? thickness
-                                                  : "100%",
-                                  cursor,
-                          };
+                                width:
+                                        single.axis === "y"
+                                                ? "100%"
+                                                : thickness,
+                                height:
+                                        single.axis === "y"
+                                                ? thickness
+                                                : "100%",
+                                cursor,
+                        };
         });
 
-        let startMouse = { x: 0, y: 0 };
-        let startNode = { x: 0, y: 0, width: 0, height: 0 };
-        let dragging = false;
+        const dragHandler = createDragHandler<{
+                width: number;
+                height: number;
+                x: number;
+                y: number;
+                clientX: number;
+                clientY: number;
+        }>({
+                onStart: (e) => {
+                        const clientX =
+                                e instanceof MouseEvent
+                                        ? e.clientX
+                                        : e.touches[0]!.clientX;
+                        const clientY =
+                                e instanceof MouseEvent
+                                        ? e.clientY
+                                        : e.touches[0]!.clientY;
 
-        const onMouseDown = (e: MouseEvent) => {
-                e.stopPropagation();
+                        return {
+                                width: props.node.width,
+                                height: props.node.height,
+                                x: props.node.x,
+                                y: props.node.y,
+                                clientX,
+                                clientY,
+                        };
+                },
+                onMove: (e, startNode) => {
+                        const clientX =
+                                e instanceof MouseEvent
+                                        ? e.clientX
+                                        : e.touches[0]!.clientX;
+                        const clientY =
+                                e instanceof MouseEvent
+                                        ? e.clientY
+                                        : e.touches[0]!.clientY;
 
-                document.documentElement.style.userSelect = "none";
-                dragging = true;
+                        let { width, height, x, y } = startNode;
 
-                startMouse = { x: e.clientX, y: e.clientY };
-                startNode = { ...props.node };
+                        for (const a of axes) {
+                                const zoom = props.kit.viewport().zoom;
+                                const grid = props.kit.gridSize();
+                                const delta =
+                                        a.axis === "x"
+                                                ? calculateDelta(
+                                                        clientX,
+                                                        startNode.clientX,
+                                                        zoom,
+                                                        grid,
+                                                )
+                                                : calculateDelta(
+                                                        clientY,
+                                                        startNode.clientY,
+                                                        zoom,
+                                                        grid,
+                                                );
+                                const diff = delta * a.sign;
 
-                window.addEventListener("mousemove", onMouseMove);
-                window.addEventListener("mouseup", onMouseUp, { once: true });
-        };
-
-        const onMouseMove = (e: MouseEvent) => {
-                if (!dragging) return;
-
-                let { width, height, x, y } = startNode;
-
-                for (const a of axes) {
-                        const zoom = props.kit.viewport().zoom;
-                        const delta =
-                                a.axis === "x"
-                                        ? Math.round(
-                                                  (e.clientX - startMouse.x) /
-                                                          zoom /
-                                                          props.kit.gridSize(),
-                                          ) * props.kit.gridSize()
-                                        : Math.round(
-                                                  (e.clientY - startMouse.y) /
-                                                          zoom /
-                                                          props.kit.gridSize(),
-                                          ) * props.kit.gridSize();
-
-                        const diff = delta * a.sign;
-
-                        if (a.axis === "x") {
-                                width += diff;
-                                if (
-                                        props.side === "left" ||
-                                        props.side === "tl" ||
-                                        props.side === "bl"
-                                ) {
-                                        x -= diff;
-                                }
-                        } else {
-                                height += diff;
-                                if (
-                                        props.side === "top" ||
-                                        props.side === "tl" ||
-                                        props.side === "tr"
-                                ) {
-                                        y -= diff;
+                                if (a.axis === "x") {
+                                        width += diff;
+                                        if (
+                                                props.side === "left" ||
+                                                props.side === "tl" ||
+                                                props.side === "bl"
+                                        ) {
+                                                x -= diff;
+                                        }
+                                } else {
+                                        height += diff;
+                                        if (
+                                                props.side === "top" ||
+                                                props.side === "tl" ||
+                                                props.side === "tr"
+                                        ) {
+                                                y -= diff;
+                                        }
                                 }
                         }
-                }
 
-                props.kit.setNodes((n: NodeType) => n.id === props.node.id, {
-                        width,
-                        height,
-                        x,
-                        y,
-                });
-        };
-
-        const onMouseUp = () => {
-                dragging = false;
-                if (
-                        (
-                                [
-                                        "width",
-                                        "height",
-                                        "x",
-                                        "y",
-                                ] as (keyof typeof startNode)[]
-                        ).some((K) => startNode[K] !== props.node[K])
-                ) {
-                        props.kit.updateNodes();
-                }
-                document.documentElement.style.userSelect = "auto";
-                window.removeEventListener("mousemove", onMouseMove);
-        };
+                        props.kit.setNodes(
+                                (n: NodeType) => n.id === props.node.id,
+                                {
+                                        width,
+                                        height,
+                                        x,
+                                        y,
+                                },
+                        );
+                },
+                onEnd: (_, startNode) => {
+                        if (
+                                (["width", "height", "x", "y"] as const).some(
+                                        (K) => startNode[K] !== props.node[K],
+                                )
+                        ) {
+                                props.kit.updateNodes();
+                        }
+                },
+                stopPropagation: true,
+                preventDefault: true,
+                disableSelection: true,
+        });
 
         const onMouseEnter = () => {
                 const { from } = props.kit.activeConnection;
@@ -204,97 +222,6 @@ const Edge: Component<{
                         from,
                 };
         };
-        //
-        const onTouchStart = (e: TouchEvent) => {
-                e.preventDefault();
-                // sp kinda weird here
-                e.stopPropagation();
-
-                if (e.touches.length !== 1) return;
-
-                document.documentElement.style.userSelect = "none";
-                dragging = true;
-
-                startMouse = {
-                        x: e.touches[0]!.clientX,
-                        y: e.touches[0]!.clientY,
-                };
-                startNode = { ...props.node };
-
-                window.addEventListener("touchmove", onTouchMove);
-                window.addEventListener("touchend", onTouchEnd, { once: true });
-        };
-
-        const onTouchMove = (e: TouchEvent) => {
-                if (!dragging || e.touches.length !== 1) return;
-
-                let { width, height, x, y } = startNode;
-
-                for (const a of axes) {
-                        const zoom = props.kit.viewport().zoom;
-                        const delta =
-                                a.axis === "x"
-                                        ? Math.round(
-                                                  (e.touches[0]!.clientX -
-                                                          startMouse.x) /
-                                                          zoom /
-                                                          props.kit.gridSize(),
-                                          ) * props.kit.gridSize()
-                                        : Math.round(
-                                                  (e.touches[0]!.clientY -
-                                                          startMouse.y) /
-                                                          zoom /
-                                                          props.kit.gridSize(),
-                                          ) * props.kit.gridSize();
-
-                        const diff = delta * a.sign;
-
-                        if (a.axis === "x") {
-                                width += diff;
-                                if (
-                                        props.side === "left" ||
-                                        props.side === "tl" ||
-                                        props.side === "bl"
-                                ) {
-                                        x -= diff;
-                                }
-                        } else {
-                                height += diff;
-                                if (
-                                        props.side === "top" ||
-                                        props.side === "tl" ||
-                                        props.side === "tr"
-                                ) {
-                                        y -= diff;
-                                }
-                        }
-                }
-
-                props.kit.setNodes((n: NodeType) => n.id === props.node.id, {
-                        width,
-                        height,
-                        x,
-                        y,
-                });
-        };
-
-        const onTouchEnd = () => {
-                dragging = false;
-                if (
-                        (
-                                [
-                                        "width",
-                                        "height",
-                                        "x",
-                                        "y",
-                                ] as (keyof typeof startNode)[]
-                        ).some((K) => startNode[K] !== props.node[K])
-                ) {
-                        props.kit.updateNodes();
-                }
-                document.documentElement.style.userSelect = "auto";
-                window.removeEventListener("touchmove", onTouchMove);
-        };
 
         return (
                 <div
@@ -305,8 +232,8 @@ const Edge: Component<{
                         }}
                         onMouseEnter={onMouseEnter}
                         onMouseLeave={onMouseLeave}
-                        onMouseDown={onMouseDown}
-                        ontouchstart={onTouchStart}
+                        onMouseDown={dragHandler.onMouseDown}
+                        ontouchstart={dragHandler.onTouchStart}
                 >
                         <Show when={!isCorner}>
                                 <AnchorPoint

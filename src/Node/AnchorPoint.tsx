@@ -1,5 +1,12 @@
-import { Component, createSignal } from "solid-js";
-import { ConnectionType, NodeType, Position, Kit } from "src/types";
+import { Component } from "solid-js";
+import {
+        snapToGrid,
+        getTouchCoords,
+        disableUserSelect,
+        enableUserSelect,
+        clientToCanvasCoords,
+} from "../lib/eventUtils";
+import { ConnectionType, NodeType, Position, Kit } from "../types";
 
 const sides: Position[] = ["left", "right", "top", "bottom"];
 
@@ -8,41 +15,44 @@ const AnchorPoint: Component<{
         kit: Kit;
         id: string;
 }> = (props) => {
+        let anchorRef!: HTMLDivElement;
+        let touchStartPos: { x: number; y: number } | null = null;
+        let dragging = false;
+
         const onMouseMove = (e: MouseEvent) => {
                 if (!props.kit.activeConnection.from) return;
 
-                const { x, y, zoom } = props.kit.viewport();
-                const rect = props.kit.containerRect;
-                if (!rect) return;
+                const coords = clientToCanvasCoords(
+                        e.clientX,
+                        e.clientY,
+                        props.kit.viewport(),
+                        props.kit.containerRect,
+                );
 
-                props.kit.setActiveConnectionDestination({
-                        x: (e.clientX - rect.left - x) / zoom,
-                        y: (e.clientY - rect.top - y) / zoom,
-                });
+                if (coords) {
+                        props.kit.setActiveConnectionDestination(coords);
+                }
         };
 
         const onUp = () => {
+                if (!dragging) {
+                        cleanupConnection();
+                        return;
+                }
                 const kit = props.kit;
                 if (kit.activeConnection.from) {
                         let to = kit.activeConnection.to;
                         if (!to) {
                                 const dest = kit.activeConnectionDestination();
+                                const gridSize = props.kit.gridSize();
                                 if (dest) {
+                                        const x = snapToGrid(dest.x, gridSize);
+                                        const y = snapToGrid(dest.y, gridSize);
                                         const id = kit.randomId("node");
                                         const node: NodeType = {
                                                 id,
-                                                x:
-                                                        Math.round(
-                                                                dest.x /
-                                                                        props.kit.gridSize(),
-                                                        ) *
-                                                        props.kit.gridSize(),
-                                                y:
-                                                        Math.round(
-                                                                dest.y /
-                                                                        props.kit.gridSize(),
-                                                        ) *
-                                                        props.kit.gridSize(),
+                                                x,
+                                                y,
                                                 width: 5 * kit.gridSize(),
                                                 height: 2 * kit.gridSize(),
                                                 data: {
@@ -81,57 +91,88 @@ const AnchorPoint: Component<{
                 cleanupConnection();
         };
 
-        const startConnection = (clientX: number, clientY: number) => {
-                document.documentElement.style.userSelect = "none";
+        const startConnection = () => {
+                if (!anchorRef) return;
+                const { x, y, width, height } =
+                        anchorRef.getBoundingClientRect();
+                const X = x + width / 2;
+                const Y = y + height / 2;
+                disableUserSelect();
                 props.kit.activeConnection = {
                         from: {
                                 side: props.side,
                                 id: props.id,
                         },
                 };
-                const { x, y, zoom } = props.kit.viewport();
-                const rect = props.kit.containerRect;
-                if (!rect) return;
-                props.kit.setActiveConnectionDestination({
-                        x: (clientX - rect.left - x) / zoom,
-                        y: (clientY - rect.top - y) / zoom,
-                });
+
+                const coords = clientToCanvasCoords(
+                        X,
+                        Y,
+                        props.kit.viewport(),
+                        props.kit.containerRect,
+                );
+
+                if (coords) {
+                        props.kit.setActiveConnectionDestination(coords);
+                }
         };
 
         const onMouseDown = (e: MouseEvent) => {
                 e.stopPropagation();
-                startConnection(e.clientX, e.clientY);
+                dragging = true;
+                startConnection();
                 window.addEventListener("mousemove", onMouseMove);
                 window.addEventListener("mouseup", onUp, { once: true });
         };
 
-        const onTouchStart = (e: TouchEvent) => {
+        const onTouchStart = (
+                e: TouchEvent & { currentTarget: HTMLDivElement },
+        ) => {
                 e.stopPropagation();
-                if (e.touches.length !== 1) return;
                 e.preventDefault();
-                startConnection(e.touches[0]!.clientX, e.touches[0]!.clientY);
+                //
+                const touch = e.touches[0];
+                if (!touch) return;
+                // 1px will suffer
+                touchStartPos = { x: touch.clientX, y: touch.clientY };
+                dragging = false;
+                //
+                startConnection();
+                //
                 window.addEventListener("touchmove", onTouchMove);
                 window.addEventListener("touchend", onUp, { once: true });
         };
 
         const onTouchMove = (e: TouchEvent) => {
-                if (e.touches.length !== 1 || !props.kit.activeConnection.from)
-                        return;
+                const coords = getTouchCoords(e);
+                if (!coords || !props.kit.activeConnection.from) return;
 
                 e.preventDefault();
+                if (!dragging && touchStartPos) {
+                        const dx = coords.x - touchStartPos.x;
+                        const dy = coords.y - touchStartPos.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > props.kit.gridSize()) {
+                                dragging = true;
+                        } else {
+                                return;
+                        }
+                }
 
-                const { x, y, zoom } = props.kit.viewport();
-                const rect = props.kit.containerRect;
-                if (!rect) return;
+                const canvasCoords = clientToCanvasCoords(
+                        coords.x,
+                        coords.y,
+                        props.kit.viewport(),
+                        props.kit.containerRect,
+                );
 
-                props.kit.setActiveConnectionDestination({
-                        x: (e.touches[0]!.clientX - rect.left - x) / zoom,
-                        y: (e.touches[0]!.clientY - rect.top - y) / zoom,
-                });
+                if (canvasCoords) {
+                        props.kit.setActiveConnectionDestination(canvasCoords);
+                }
         };
 
         const cleanupConnection = () => {
-                document.documentElement.style.userSelect = "auto";
+                enableUserSelect();
                 props.kit.setActiveConnectionDestination(null);
                 props.kit.activeConnection = {};
                 window.removeEventListener("mousemove", onMouseMove);
@@ -140,6 +181,7 @@ const AnchorPoint: Component<{
 
         return (
                 <div
+                        ref={anchorRef}
                         class="node-handle"
                         onMouseDown={onMouseDown}
                         ontouchstart={onTouchStart}

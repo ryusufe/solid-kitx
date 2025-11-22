@@ -42,7 +42,7 @@ const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
 
         return (
                 <div class="kit-controls" style={{ "--flex-direction": "row" }}>
-                        <button onclick={removeNode}>
+                        <button onclick={removeNode} ontouchstart={removeNode}>
                                 <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24"
@@ -67,6 +67,7 @@ const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
                         </button>
                         <button
                                 onclick={changeOutlineColor}
+                                ontouchstart={changeOutlineColor}
                                 title="Changes outline color"
                         >
                                 <svg

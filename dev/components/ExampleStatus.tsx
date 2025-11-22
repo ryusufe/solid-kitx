@@ -1,4 +1,4 @@
-import { Component, createMemo, For } from "solid-js";
+import { Component, createMemo, createSignal, For } from "solid-js";
 import { Kit, NodeType } from "solid-kitx";
 const colors = [
         "#fee440",
@@ -36,6 +36,7 @@ const colors = [
 ];
 
 const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
+        let property = "outline-color";
         const selected = createMemo((prev) => {
                 const selectedItems = props.kit.selectedItems();
                 const size = selectedItems.size;
@@ -56,7 +57,7 @@ const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
                                                   ...n,
                                                   style: {
                                                           ...n.style,
-                                                          "outline-color": c,
+                                                          [property]: c,
                                                   },
                                           }
                                         : n,
@@ -119,6 +120,9 @@ const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
                                                         onclick={() =>
                                                                 onSelect(c)
                                                         }
+                                                        ontouchstart={() =>
+                                                                onSelect(c)
+                                                        }
                                                         style={{
                                                                 "background-color":
                                                                         c,
@@ -134,6 +138,18 @@ const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
                                         )}
                                 </For>
                         </div>
+                        <select
+                                style={{ width: "100%", "margin-top": "10px" }}
+                                onchange={(v) => {
+                                        property = v.currentTarget.value;
+                                }}
+                        >
+                                <option value="outline-color">outline</option>
+                                <option value="color">text</option>
+                                <option value="background-color">
+                                        background
+                                </option>
+                        </select>
                 </div>
         );
 };

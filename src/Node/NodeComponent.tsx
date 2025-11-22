@@ -3,6 +3,7 @@ import { Dynamic } from "solid-js/web";
 import type { ComponentsType, NodeType } from "../types";
 import { useKitContext } from "../lib/KitContext";
 import Edge, { EdgePosition } from "./Edge";
+import { createDragHandler, calculateDelta } from "../lib/eventUtils";
 
 interface NodeProps {
         node: NodeType;
@@ -13,13 +14,13 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
         const kit = useKitContext();
         const gridSize = createMemo(() => kit.gridSize());
         const type = createMemo(() => node.data?.component?.type);
-        const component = createMemo(() =>
+        const component = createMemo<boolean>(() =>
                 node.data?.component?.type
-                        ? components![node.data!.component!.type!]
-                        : null,
+                        ? !!components![node.data!.component!.type!]
+                        : false,
         );
         //
-        const Toolbar = createMemo(() => components?.["node-toolbar"]);
+        const Toolbar = createMemo(() => !!components?.["node-toolbar"]);
         //
         const selected = createMemo(() => {
                 if (!kit) return false;
@@ -39,52 +40,87 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
 
         let nodeDiv!: HTMLDivElement;
 
-        let startMouse = { x: 0, y: 0 };
-        let startPos = { x: 0, y: 0 };
-        let dragging = false;
         const controller = new AbortController();
+
+        const dragHandler = createDragHandler<{
+                x: number;
+                y: number;
+                clientX: number;
+                clientY: number;
+        }>({
+                onStart: (e) => {
+                        setSelected(true);
+                        if (kit.focus()) {
+                                e.stopPropagation();
+                                return;
+                        }
+
+                        const clientX =
+                                e instanceof MouseEvent
+                                        ? e.clientX
+                                        : e.touches[0]!.clientX;
+                        const clientY =
+                                e instanceof MouseEvent
+                                        ? e.clientY
+                                        : e.touches[0]!.clientY;
+
+                        return {
+                                x: node.x,
+                                y: node.y,
+                                clientX,
+                                clientY,
+                        };
+                },
+                onMove: (e, startData) => {
+                        const clientX =
+                                e instanceof MouseEvent
+                                        ? e.clientX
+                                        : e.touches[0]!.clientX;
+                        const clientY =
+                                e instanceof MouseEvent
+                                        ? e.clientY
+                                        : e.touches[0]!.clientY;
+
+                        const zoom = kit.viewport().zoom;
+                        const dx = calculateDelta(
+                                clientX,
+                                startData.clientX,
+                                zoom,
+                                gridSize(),
+                        );
+                        const dy = calculateDelta(
+                                clientY,
+                                startData.clientY,
+                                zoom,
+                                gridSize(),
+                        );
+
+                        const x = startData.x + dx;
+                        const y = startData.y + dy;
+
+                        kit.setNodes((n: NodeType) => n.id === node.id, {
+                                x,
+                                y,
+                        });
+                },
+                onEnd: (_, startData) => {
+                        if (startData.x !== node.x || startData.y !== node.y) {
+                                kit.updateNodes();
+                        }
+                },
+                preventDefault: true,
+        });
 
         const onMouseDown = (
                 e: MouseEvent & { currentTarget: HTMLDivElement },
         ) => {
-                setSelected(true);
-                if (kit.focus()) {
-                        e.stopPropagation();
-                        return;
-                }
-                e.preventDefault();
-                dragging = true;
-                startMouse = { x: e.clientX, y: e.clientY };
-                const { x, y, ..._ } = node;
-                startPos = { x, y };
-                window.addEventListener("mousemove", onMouseMove, {
-                        signal: controller.signal,
-                });
-                window.addEventListener("mouseup", onMouseUp, {
-                        once: true,
-                        signal: controller.signal,
-                });
+                dragHandler.onMouseDown(e);
         };
 
-        const onMouseMove = (e: MouseEvent) => {
-                if (!dragging) return;
-
-                const zoom = kit.viewport().zoom;
-                const dx = (e.clientX - startMouse.x) / zoom;
-                const dy = (e.clientY - startMouse.y) / zoom;
-
-                const x = startPos.x + Math.round(dx / gridSize()) * gridSize();
-                const y = startPos.y + Math.round(dy / gridSize()) * gridSize();
-
-                kit.setNodes((n: NodeType) => n.id === node.id, { x, y });
-        };
-
-        const onMouseUp = () => {
-                dragging = false;
-                if (startPos.x !== node.x || startPos.y !== node.y) {
-                        kit.updateNodes();
-                }
-                window.removeEventListener("mousemove", onMouseMove);
+        const onTouchStart = (
+                e: TouchEvent & { currentTarget: HTMLDivElement },
+        ) => {
+                dragHandler.onTouchStart(e);
         };
 
         createEffect(() => {
@@ -116,58 +152,6 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                         setSelected(false);
                         window.removeEventListener("keydown", onKeyDown);
                 }
-        };
-        //
-        const onTouchStart = (
-                e: TouchEvent & { currentTarget: HTMLDivElement },
-        ) => {
-                if (e.touches.length !== 1) return;
-
-                setSelected(true);
-                if (kit.focus()) {
-                        e.stopPropagation();
-                        return;
-                }
-                e.preventDefault();
-                dragging = true;
-
-                startMouse = {
-                        x: e.touches[0]!.clientX,
-                        y: e.touches[0]!.clientY,
-                };
-
-                const { x, y, ..._ } = node;
-                startPos = { x, y };
-
-                window.addEventListener("touchmove", onTouchMove, {
-                        signal: controller.signal,
-                });
-                window.addEventListener("touchend", onTouchEnd, {
-                        once: true,
-                        signal: controller.signal,
-                });
-        };
-
-        const onTouchMove = (e: TouchEvent) => {
-                if (!dragging || e.touches.length !== 1) return;
-
-                const zoom = kit.viewport().zoom;
-
-                const dx = (e.touches[0]!.clientX - startMouse.x) / zoom;
-                const dy = (e.touches[0]!.clientY - startMouse.y) / zoom;
-
-                const x = startPos.x + Math.round(dx / gridSize()) * gridSize();
-                const y = startPos.y + Math.round(dy / gridSize()) * gridSize();
-
-                kit.setNodes((n: NodeType) => n.id === node.id, { x, y });
-        };
-
-        const onTouchEnd = () => {
-                dragging = false;
-                if (startPos.x !== node.x || startPos.y !== node.y) {
-                        kit.updateNodes();
-                }
-                window.removeEventListener("touchmove", onTouchMove);
         };
 
         onCleanup(() => {
@@ -202,7 +186,11 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                         }}
                                 >
                                         <Dynamic
-                                                component={Toolbar()}
+                                                component={
+                                                        components?.[
+                                                        "node-toolbar"
+                                                        ]
+                                                }
                                                 kit={kit}
                                                 node={node}
                                         />
@@ -235,8 +223,8 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                                                 .length === 0
                                                                 ? undefined
                                                                 : e
-                                                                          .currentTarget
-                                                                          .innerText;
+                                                                        .currentTarget
+                                                                        .innerText;
 
                                                 kit.setNodes(
                                                         (n: NodeType) =>
@@ -273,7 +261,13 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                         }}
                                 >
                                         <Dynamic
-                                                component={component()}
+                                                component={
+                                                        components![
+                                                        node.data!
+                                                                .component!
+                                                                .type!
+                                                        ]
+                                                }
                                                 {...node.data?.component?.props}
                                                 node={node}
                                                 kit={kit}

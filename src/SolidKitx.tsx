@@ -1,12 +1,4 @@
-import {
-        createEffect,
-        createMemo,
-        For,
-        JSX,
-        onCleanup,
-        onMount,
-        Show,
-} from "solid-js";
+import { createMemo, For, JSX, onCleanup, onMount, Show } from "solid-js";
 import {
         ComponentsType,
         ConnectionType,
@@ -38,17 +30,6 @@ interface SolidKitProps {
 }
 export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         const kit = createKit({ ...props, gridSize });
-
-        // it's better to control these values using kit obj
-        // createEffect(() => {
-        //         if (props.nodes) kit.setNodes(props.nodes);
-        // });
-        // createEffect(() => {
-        //         if (props.connections) kit.setConnections(props.connections);
-        // });
-        // createEffect(() => {
-        //         if (props.viewport) kit.setViewport(props.viewport);
-        // });
 
         const attachMouseMove = (e: MouseEvent) => {
                 const prev = kit.viewport();
@@ -88,18 +69,17 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
 
                 const prev = kit.viewport();
                 const oldZoom = prev.zoom;
-                const newZoom = Math.max(
+                const zoom = Math.max(
                         0.1,
                         Math.min(5, oldZoom - e.deltaY * 0.001),
                 );
 
-                const newX = cursorX - (cursorX - prev.x) * (newZoom / oldZoom);
-                const newY = cursorY - (cursorY - prev.y) * (newZoom / oldZoom);
-
+                const x = cursorX - ((cursorX - prev.x) / oldZoom) * zoom;
+                const y = cursorY - ((cursorY - prev.y) / oldZoom) * zoom;
                 kit.setViewport({
-                        zoom: newZoom,
-                        x: newX,
-                        y: newY,
+                        zoom,
+                        x,
+                        y,
                 });
         };
 
@@ -141,7 +121,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         let pinchStartDist = 0;
         let pinchStartZoom = 1;
         let initialViewport = { x: 0, y: 0, zoom: 1 };
-
         const getDistance = (touches: TouchList) => {
                 const [t1, t2] = touches;
                 if (!t1 || !t2) return 0;
@@ -150,26 +129,30 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         t1.clientY - t2.clientY,
                 );
         };
-
         const onTouchStart = (
                 e: TouchEvent & { currentTarget: HTMLDivElement },
         ) => {
                 if (kit.focus()) return;
                 if ((e.target as HTMLElement).closest(".node")) return;
-
+                for (const touch of Array.from(e.touches)) {
+                        const el = document.elementFromPoint(
+                                touch.clientX,
+                                touch.clientY,
+                        );
+                        if (el?.closest(".node")) {
+                                return;
+                        }
+                }
                 if (e.touches.length > 1) {
                         e.preventDefault();
                 }
-
                 initialViewport = kit.viewport();
-
                 touchCache = Array.from(e.touches);
-
+                // z
                 if (e.touches.length === 2) {
                         pinchStartDist = getDistance(e.touches);
                         pinchStartZoom = initialViewport.zoom;
                 }
-
                 window.addEventListener("touchmove", onTouchMove, {
                         passive: false,
                 });
@@ -178,22 +161,18 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         once: true,
                 });
         };
-
         const onTouchMove = (e: TouchEvent) => {
                 const currentTouches = Array.from(e.touches);
                 const touchCount = currentTouches.length;
-
+                // zomming
                 if (touchCount === 2) {
                         e.preventDefault();
-
                         const dist = getDistance(e.touches);
                         const scale = dist / pinchStartDist;
-
                         const zoom = Math.max(
                                 0.1,
                                 Math.min(5, pinchStartZoom * scale),
                         );
-
                         const rect = (
                                 e.currentTarget as HTMLDivElement
                         ).getBoundingClientRect();
@@ -205,33 +184,28 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                 (currentTouches[0]!.clientY +
                                         currentTouches[1]!.clientY) /
                                 2;
-
                         const cursorX = centerX - rect.left;
                         const cursorY = centerY - rect.top;
-
                         const x =
                                 cursorX -
                                 (cursorX - initialViewport.x) *
-                                        (zoom / initialViewport.zoom);
+                                (zoom / initialViewport.zoom);
                         const y =
                                 cursorY -
                                 (cursorY - initialViewport.y) *
-                                        (zoom / initialViewport.zoom);
+                                (zoom / initialViewport.zoom);
                         kit.setViewport({
                                 zoom,
                                 x,
                                 y,
                         });
-
                         return;
                 }
-
+                // dragging
                 if (touchCount === 1) {
                         e.preventDefault();
-
                         const currentTouch = currentTouches[0];
                         const previousTouch = touchCache[0];
-
                         if (previousTouch) {
                                 const dx =
                                         currentTouch!.clientX -
@@ -239,7 +213,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                 const dy =
                                         currentTouch!.clientY -
                                         previousTouch.clientY;
-
                                 const prev = kit.viewport();
                                 kit.setViewport({
                                         ...prev,
@@ -248,20 +221,16 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                 });
                         }
                 }
-
                 touchCache = currentTouches;
         };
 
         const onTouchEnd = () => {
                 if (kit.viewport() !== initialViewport) {
                         kit.updateViewport();
-                        // alert("updated vp");
                 }
-
                 window.removeEventListener("touchmove", onTouchMove);
                 window.removeEventListener("touchend", onTouchEnd);
                 window.removeEventListener("touchcancel", onTouchEnd);
-
                 touchCache = [];
                 pinchStartDist = 0;
                 pinchStartZoom = 1;
@@ -279,7 +248,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                 window.removeEventListener("mousemove", attachMouseMove);
                 window.removeEventListener("resize", updateRect);
                 window.removeEventListener("keydown", onKeyDown);
-                //
                 window.removeEventListener("touchmove", onTouchMove);
         });
 
@@ -290,12 +258,10 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                 class="solid-kitx"
                                 style={{
                                         "--bg-vp-zoom": `${vp().zoom * 1.2}px`,
-                                        "background-size": `${
-                                                gridSize * vp().zoom
-                                        }px ${gridSize * vp().zoom}px`,
-                                        "background-position": `${vp().x}px ${
-                                                vp().y
-                                        }px`,
+                                        "background-size": `${gridSize * vp().zoom
+                                                }px ${gridSize * vp().zoom}px`,
+                                        "background-position": `${vp().x}px ${vp().y
+                                                }px`,
                                         "background-repeat": "repeat",
                                 }}
                                 onmousedown={onMouseDown}
@@ -307,11 +273,9 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                         class="container"
                                         style={{
                                                 "transform-origin": "0 0",
-                                                transform: `translate(${
-                                                        vp().x
-                                                }px, ${vp().y}px) scale(${
-                                                        vp().zoom
-                                                })`,
+                                                transform: `translate(${vp().x
+                                                        }px, ${vp().y}px) scale(${vp().zoom
+                                                        })`,
                                                 position: "relative",
                                         }}
                                 >
@@ -332,7 +296,7 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                                                 Toolbar={
                                                                         props
                                                                                 .components?.[
-                                                                                "connection-toolbar"
+                                                                        "connection-toolbar"
                                                                         ]
                                                                 }
                                                         />
