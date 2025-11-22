@@ -1,7 +1,6 @@
 import { Component } from "solid-js";
 import {
         snapToGrid,
-        getTouchCoords,
         disableUserSelect,
         enableUserSelect,
         clientToCanvasCoords,
@@ -16,17 +15,17 @@ const AnchorPoint: Component<{
         id: string;
 }> = (props) => {
         let anchorRef!: HTMLDivElement;
-        let touchStartPos: { x: number; y: number } | null = null;
+        let pointerStartPos: { x: number; y: number } | null = null;
         let dragging = false;
 
-        const onMouseMove = (e: MouseEvent) => {
+        const onPointerMove = (e: PointerEvent) => {
                 if (!props.kit.activeConnection.from) return;
 
                 const coords = clientToCanvasCoords(
                         e.clientX,
                         e.clientY,
                         props.kit.viewport(),
-                        props.kit.containerRect,
+                        props.kit.container?.getBoundingClientRect()!,
                 );
 
                 if (coords) {
@@ -95,8 +94,6 @@ const AnchorPoint: Component<{
                 if (!anchorRef) return;
                 const { x, y, width, height } =
                         anchorRef.getBoundingClientRect();
-                const X = x + width / 2;
-                const Y = y + height / 2;
                 disableUserSelect();
                 props.kit.activeConnection = {
                         from: {
@@ -106,10 +103,10 @@ const AnchorPoint: Component<{
                 };
 
                 const coords = clientToCanvasCoords(
-                        X,
-                        Y,
+                        x + width / 2,
+                        y + height / 2,
                         props.kit.viewport(),
-                        props.kit.containerRect,
+                        props.kit.container?.getBoundingClientRect()!,
                 );
 
                 if (coords) {
@@ -117,74 +114,35 @@ const AnchorPoint: Component<{
                 }
         };
 
-        const onMouseDown = (e: MouseEvent) => {
+        const onPointerDown = (e: PointerEvent) => {
                 e.stopPropagation();
+                e.preventDefault();
+
+                pointerStartPos = { x: e.clientX, y: e.clientY };
                 dragging = true;
+
                 startConnection();
-                window.addEventListener("mousemove", onMouseMove);
-                window.addEventListener("mouseup", onUp, { once: true });
-        };
 
-        const onTouchStart = (
-                e: TouchEvent & { currentTarget: HTMLDivElement },
-        ) => {
-                e.stopPropagation();
-                e.preventDefault();
-                //
-                const touch = e.touches[0];
-                if (!touch) return;
-                // 1px will suffer
-                touchStartPos = { x: touch.clientX, y: touch.clientY };
-                dragging = false;
-                //
-                startConnection();
-                //
-                window.addEventListener("touchmove", onTouchMove);
-                window.addEventListener("touchend", onUp, { once: true });
-        };
-
-        const onTouchMove = (e: TouchEvent) => {
-                const coords = getTouchCoords(e);
-                if (!coords || !props.kit.activeConnection.from) return;
-
-                e.preventDefault();
-                if (!dragging && touchStartPos) {
-                        const dx = coords.x - touchStartPos.x;
-                        const dy = coords.y - touchStartPos.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist > props.kit.gridSize()) {
-                                dragging = true;
-                        } else {
-                                return;
-                        }
-                }
-
-                const canvasCoords = clientToCanvasCoords(
-                        coords.x,
-                        coords.y,
-                        props.kit.viewport(),
-                        props.kit.containerRect,
-                );
-
-                if (canvasCoords) {
-                        props.kit.setActiveConnectionDestination(canvasCoords);
-                }
+                window.addEventListener("pointermove", onPointerMove);
+                window.addEventListener("pointerup", onUp, { once: true });
+                window.addEventListener("pointercancel", onUp, { once: true });
         };
 
         const cleanupConnection = () => {
                 enableUserSelect();
                 props.kit.setActiveConnectionDestination(null);
                 props.kit.activeConnection = {};
-                window.removeEventListener("mousemove", onMouseMove);
-                window.removeEventListener("touchmove", onTouchMove);
+                window.removeEventListener("pointermove", onPointerMove);
+                window.removeEventListener("pointerup", onUp);
+                window.removeEventListener("pointercancel", onUp);
+                pointerStartPos = null;
         };
 
         return (
                 <div
                         ref={anchorRef}
                         class="node-anchor"
-                        onMouseDown={onMouseDown}
-                        ontouchstart={onTouchStart}
+                        onPointerDown={onPointerDown}
                 ></div>
         );
 };

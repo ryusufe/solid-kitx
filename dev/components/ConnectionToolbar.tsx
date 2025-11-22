@@ -33,7 +33,7 @@ const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
 
         return (
                 <div class="kit-controls" style={{ "--flex-direction": "row" }}>
-                        <button onclick={removeConnection}>
+                        <button onpointerdown={removeConnection}>
                                 <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24"
@@ -56,7 +56,7 @@ const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
                                         <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                                 </svg>
                         </button>
-                        <button onclick={changeLineColor}>
+                        <button onpointerdown={changeLineColor}>
                                 <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 24 24"

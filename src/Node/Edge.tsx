@@ -50,25 +50,25 @@ const Edge: Component<{
         const cornerAxes =
                 props.side === "tl"
                         ? [
-                                { axis: "x", sign: -1 },
-                                { axis: "y", sign: -1 },
-                        ]
+                                  { axis: "x", sign: -1 },
+                                  { axis: "y", sign: -1 },
+                          ]
                         : props.side === "tr"
-                                ? [
-                                        { axis: "x", sign: 1 },
-                                        { axis: "y", sign: -1 },
-                                ]
-                                : props.side === "bl"
-                                        ? [
-                                                { axis: "x", sign: -1 },
-                                                { axis: "y", sign: 1 },
-                                        ]
-                                        : props.side === "br"
-                                                ? [
-                                                        { axis: "x", sign: 1 },
-                                                        { axis: "y", sign: 1 },
-                                                ]
-                                                : [];
+                        ? [
+                                  { axis: "x", sign: 1 },
+                                  { axis: "y", sign: -1 },
+                          ]
+                        : props.side === "bl"
+                        ? [
+                                  { axis: "x", sign: -1 },
+                                  { axis: "y", sign: 1 },
+                          ]
+                        : props.side === "br"
+                        ? [
+                                  { axis: "x", sign: 1 },
+                                  { axis: "y", sign: 1 },
+                          ]
+                        : [];
 
         const axes = isCorner ? cornerAxes : [single];
 
@@ -83,21 +83,21 @@ const Edge: Component<{
 
                 return isCorner
                         ? {
-                                width: thickness,
-                                height: thickness,
-                                cursor,
-                        }
+                                  width: thickness,
+                                  height: thickness,
+                                  cursor,
+                          }
                         : {
-                                width:
-                                        single.axis === "y"
-                                                ? "100%"
-                                                : thickness,
-                                height:
-                                        single.axis === "y"
-                                                ? thickness
-                                                : "100%",
-                                cursor,
-                        };
+                                  width:
+                                          single.axis === "y"
+                                                  ? "100%"
+                                                  : thickness,
+                                  height:
+                                          single.axis === "y"
+                                                  ? thickness
+                                                  : "100%",
+                                  cursor,
+                          };
         });
 
         const dragHandler = createDragHandler<{
@@ -109,34 +109,16 @@ const Edge: Component<{
                 clientY: number;
         }>({
                 onStart: (e) => {
-                        const clientX =
-                                e instanceof MouseEvent
-                                        ? e.clientX
-                                        : e.touches[0]!.clientX;
-                        const clientY =
-                                e instanceof MouseEvent
-                                        ? e.clientY
-                                        : e.touches[0]!.clientY;
-
                         return {
                                 width: props.node.width,
                                 height: props.node.height,
                                 x: props.node.x,
                                 y: props.node.y,
-                                clientX,
-                                clientY,
+                                clientX: e.clientX,
+                                clientY: e.clientY,
                         };
                 },
                 onMove: (e, startNode) => {
-                        const clientX =
-                                e instanceof MouseEvent
-                                        ? e.clientX
-                                        : e.touches[0]!.clientX;
-                        const clientY =
-                                e instanceof MouseEvent
-                                        ? e.clientY
-                                        : e.touches[0]!.clientY;
-
                         let { width, height, x, y } = startNode;
 
                         for (const a of axes) {
@@ -145,17 +127,17 @@ const Edge: Component<{
                                 const delta =
                                         a.axis === "x"
                                                 ? calculateDelta(
-                                                        clientX,
-                                                        startNode.clientX,
-                                                        zoom,
-                                                        grid,
-                                                )
+                                                          e.clientX,
+                                                          startNode.clientX,
+                                                          zoom,
+                                                          grid,
+                                                  )
                                                 : calculateDelta(
-                                                        clientY,
-                                                        startNode.clientY,
-                                                        zoom,
-                                                        grid,
-                                                );
+                                                          e.clientY,
+                                                          startNode.clientY,
+                                                          zoom,
+                                                          grid,
+                                                  );
                                 const diff = delta * a.sign;
 
                                 if (a.axis === "x") {
@@ -203,7 +185,7 @@ const Edge: Component<{
                 disableSelection: true,
         });
 
-        const onMouseEnter = () => {
+        const onPinterEnter = () => {
                 const { from } = props.kit.activeConnection;
                 if (!from || isCorner) return;
                 props.kit.activeConnection = {
@@ -215,7 +197,7 @@ const Edge: Component<{
                 };
         };
 
-        const onMouseLeave = () => {
+        const onPointerLeave = () => {
                 const { from } = props.kit.activeConnection;
                 if (!from) return;
                 props.kit.activeConnection = {
@@ -230,10 +212,9 @@ const Edge: Component<{
                                 ...size(),
                                 ...positionStyle,
                         }}
-                        onMouseEnter={onMouseEnter}
-                        onMouseLeave={onMouseLeave}
-                        onMouseDown={dragHandler.onMouseDown}
-                        ontouchstart={dragHandler.onTouchStart}
+                        onpointerenter={onPinterEnter}
+                        onpointerleave={onPointerLeave}
+                        onPointerDown={dragHandler.onPointerDown}
                 >
                         <Show when={!isCorner}>
                                 <AnchorPoint

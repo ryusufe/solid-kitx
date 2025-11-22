@@ -21,7 +21,7 @@ export const Controls = ({ kit }: { kit: Kit }) => {
         };
 
         const fitView = () => {
-                if (!kit.containerRect || kit.nodes.length === 0) return;
+                if (!kit.container || kit.nodes.length === 0) return;
 
                 const nodes = kit.nodes;
                 let minX = Infinity;
@@ -37,7 +37,7 @@ export const Controls = ({ kit }: { kit: Kit }) => {
                 });
 
                 const { width: containerWidth, height: containerHeight } =
-                        kit.containerRect;
+                        kit.container.getBoundingClientRect();
                 const padding = 40;
 
                 const kitWidth = maxX - minX;
@@ -69,9 +69,10 @@ export const Controls = ({ kit }: { kit: Kit }) => {
         return (
                 <div class="kit-controls">
                         <button
-                                onclick={() => kit.setFocus((prev) => !prev)}
+                                onpointerdown={() =>
+                                        kit.setFocus((prev) => !prev)
+                                }
                                 classList={{ on: kit.focus() }}
-                                title="Focus mode"
                         >
                                 <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -110,11 +111,7 @@ export const Controls = ({ kit }: { kit: Kit }) => {
                                         </g>
                                 </svg>
                         </button>
-                        <button
-                                class="control-button"
-                                title="Zoom in"
-                                onClick={zoomIn}
-                        >
+                        <button class="control-button" onpointerdown={zoomIn}>
                                 <svg
                                         viewBox="0 0 24 24"
                                         id="plus"
@@ -131,11 +128,7 @@ export const Controls = ({ kit }: { kit: Kit }) => {
                                         ></path>
                                 </svg>
                         </button>
-                        <button
-                                class="control-button"
-                                title="Zoom out"
-                                onClick={zoomOut}
-                        >
+                        <button class="control-button" onpointerdown={zoomOut}>
                                 <svg
                                         viewBox="0 0 24 24"
                                         id="minus"
@@ -155,11 +148,7 @@ export const Controls = ({ kit }: { kit: Kit }) => {
                                         ></line>
                                 </svg>
                         </button>
-                        <button
-                                class="control-button"
-                                title="Fit screen"
-                                onClick={fitView}
-                        >
+                        <button class="control-button" onpointerdown={fitView}>
                                 <svg
                                         viewBox="0 0 24 24"
                                         id="maximize-size"

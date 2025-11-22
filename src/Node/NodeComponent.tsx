@@ -1,22 +1,21 @@
 import { createEffect, createMemo, For, onCleanup, Show } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import type { ComponentsType, NodeType } from "../types";
-import { useKitContext } from "../lib/KitContext";
+import type { ComponentsType, Kit, NodeType } from "../types";
 import Edge, { EdgePosition } from "./Edge";
 import { createDragHandler, calculateDelta } from "../lib/eventUtils";
 
 interface NodeProps {
         node: NodeType;
         components?: ComponentsType;
+        kit: Kit;
 }
 
-export const NodeComponent = ({ node, components }: NodeProps) => {
-        const kit = useKitContext();
+export const NodeComponent = ({ node, components = {}, kit }: NodeProps) => {
         const gridSize = createMemo(() => kit.gridSize());
         const type = createMemo(() => node.data?.component?.type);
-        const component = createMemo<boolean>(() =>
+        const hasComponent = createMemo<boolean>(() =>
                 node.data?.component?.type
-                        ? !!components![node.data!.component!.type!]
+                        ? !!components![node.data.component.type]
                         : false,
         );
         //
@@ -55,31 +54,16 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                 return;
                         }
 
-                        const clientX =
-                                e instanceof MouseEvent
-                                        ? e.clientX
-                                        : e.touches[0]!.clientX;
-                        const clientY =
-                                e instanceof MouseEvent
-                                        ? e.clientY
-                                        : e.touches[0]!.clientY;
-
                         return {
                                 x: node.x,
                                 y: node.y,
-                                clientX,
-                                clientY,
+                                clientX: e.clientX,
+                                clientY: e.clientY,
                         };
                 },
                 onMove: (e, startData) => {
-                        const clientX =
-                                e instanceof MouseEvent
-                                        ? e.clientX
-                                        : e.touches[0]!.clientX;
-                        const clientY =
-                                e instanceof MouseEvent
-                                        ? e.clientY
-                                        : e.touches[0]!.clientY;
+                        const clientX = e.clientX;
+                        const clientY = e.clientY;
 
                         const zoom = kit.viewport().zoom;
                         const dx = calculateDelta(
@@ -111,16 +95,10 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                 preventDefault: true,
         });
 
-        const onMouseDown = (
-                e: MouseEvent & { currentTarget: HTMLDivElement },
+        const onPointerDown = (
+                e: PointerEvent & { currentTarget: HTMLDivElement },
         ) => {
-                dragHandler.onMouseDown(e);
-        };
-
-        const onTouchStart = (
-                e: TouchEvent & { currentTarget: HTMLDivElement },
-        ) => {
-                dragHandler.onTouchStart(e);
+                dragHandler.onPointerDown(e);
         };
 
         createEffect(() => {
@@ -165,8 +143,7 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                         classList={{ selected: selected() }}
                         id={node.id}
                         tabIndex={"0"}
-                        onmousedown={onMouseDown}
-                        ontouchstart={onTouchStart}
+                        onpointerdown={onPointerDown}
                         style={{
                                 left: `${node.x}px`,
                                 top: `${node.y}px`,
@@ -188,7 +165,7 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                         <Dynamic
                                                 component={
                                                         components?.[
-                                                        "node-toolbar"
+                                                                "node-toolbar"
                                                         ]
                                                 }
                                                 kit={kit}
@@ -201,11 +178,11 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                         class="node-label"
                                         style={{
                                                 "--size":
-                                                        type() && component()
+                                                        type() && hasComponent()
                                                                 ? "fit-content"
                                                                 : "100%",
                                                 position:
-                                                        type() && component()
+                                                        type() && hasComponent()
                                                                 ? "absolute"
                                                                 : "static",
                                                 top: "-2em",
@@ -223,8 +200,8 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                                                 .length === 0
                                                                 ? undefined
                                                                 : e
-                                                                        .currentTarget
-                                                                        .innerText;
+                                                                          .currentTarget
+                                                                          .innerText;
 
                                                 kit.setNodes(
                                                         (n: NodeType) =>
@@ -252,7 +229,7 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                         {node.data?.label}
                                 </span>
                         </Show>
-                        <Show when={type() && components && component()}>
+                        <Show when={type() && components && hasComponent()}>
                                 <div
                                         class="node-component"
                                         style={{
@@ -261,13 +238,7 @@ export const NodeComponent = ({ node, components }: NodeProps) => {
                                         }}
                                 >
                                         <Dynamic
-                                                component={
-                                                        components![
-                                                        node.data!
-                                                                .component!
-                                                                .type!
-                                                        ]
-                                                }
+                                                component={components![type()!]}
                                                 {...node.data?.component?.props}
                                                 node={node}
                                                 kit={kit}

@@ -93,9 +93,6 @@
                 .connection-preview {
                         stroke: var(--connection-color, #b1b1b8);
 
-                        & circle {
-                                fill: var(--connection-color, #b1b1b8);
-                        }
                 }
 
 
@@ -244,9 +241,6 @@
                 .connection-preview {
                         stroke: var(--connection-color, #464647);
 
-                        & circle {
-                                fill: var(--connection-color, #464647);
-                        }
                 }
 
                 .connection-label {

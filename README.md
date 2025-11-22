@@ -69,4 +69,3 @@ const App: Component = () => {
 export default App;
 ```
 
-- [Read the wiki](https://github.com/ryusufe/solid-kitx/wiki)

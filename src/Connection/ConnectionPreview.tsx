@@ -25,7 +25,7 @@ const ConnectionPreview: Component<{ kit: Kit }> = (props) => {
         });
         const onMouseMove = (e: MouseEvent) => {
                 const { x, y, zoom } = props.kit.viewport();
-                const rect = props.kit.containerRect;
+                const rect = props.kit.container?.getBoundingClientRect();
                 if (!rect) return;
 
                 props.kit.setActiveConnectionDestination({
@@ -61,20 +61,6 @@ const ConnectionPreview: Component<{ kit: Kit }> = (props) => {
                                                 transition: "all 0.1s",
                                                 "stroke-width":
                                                         "var(--connection-width, 2)",
-                                        }}
-                                />
-                                <circle
-                                        cx={
-                                                props.kit.activeConnectionDestination()!
-                                                        .x
-                                        }
-                                        cy={
-                                                props.kit.activeConnectionDestination()!
-                                                        .y
-                                        }
-                                        r="5"
-                                        style={{
-                                                transition: "all 0.1s",
                                         }}
                                 />
                         </g>

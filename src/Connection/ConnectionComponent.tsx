@@ -4,18 +4,19 @@ import {
         ConnectionNode,
         ConnectionToolbarProps,
         ConnectionType,
+        Kit,
 } from "../types";
 import { createPath } from "../lib/GetPath";
-import { useKitContext } from "../lib/KitContext";
 
 export interface ConnectionProps {
         connection: ConnectionType;
         Toolbar?: Component<ConnectionToolbarProps>;
+        kit: Kit;
 }
 const ConnectionComponent: Component<ConnectionProps> = (props) => {
         let connectionRef!: SVGPathElement;
         let toolbarRef!: HTMLDivElement;
-        const kit = useKitContext();
+        const kit = props.kit;
         const selected = createMemo(() => {
                 if (!kit) return false;
                 const selectedSet = kit.selectedItems();

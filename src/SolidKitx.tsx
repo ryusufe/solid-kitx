@@ -8,7 +8,6 @@ import {
 } from "./types";
 import { NodeComponent } from "./Node/NodeComponent";
 import { createKit } from "./lib/createKit";
-import { KitContext } from "./lib/KitContext";
 import ConnectionComponent from "./Connection/ConnectionComponent";
 import ConnectionPreview from "./Connection/ConnectionPreview";
 import { Controls } from "./components/Controls";
@@ -31,32 +30,110 @@ interface SolidKitProps {
 export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         const kit = createKit({ ...props, gridSize });
 
-        const attachMouseMove = (e: MouseEvent) => {
-                const prev = kit.viewport();
-                kit.setViewport({
-                        ...prev,
-                        x: prev.x + e.movementX,
-                        y: prev.y + e.movementY,
-                });
-        };
         const vp = createMemo(() => kit.viewport());
 
-        let startViewpoint = { x: 0, y: 0, zoom: 1 };
-        const onMouseDown = (
-                e: MouseEvent & { currentTarget: HTMLDivElement },
+        let startvp = { x: 0, y: 0, zoom: 1 };
+
+        const pointers = new Map<number, { x: number; y: number }>();
+        // pinch
+        let iniPinx = 0;
+        const onPointerDown = (
+                e: PointerEvent & { currentTarget: HTMLDivElement },
         ) => {
                 if (kit.focus()) return;
                 if ((e.target as HTMLElement).closest(".node")) return;
-                startViewpoint = kit.viewport();
-                window.addEventListener("mousemove", attachMouseMove);
-                window.addEventListener("mouseup", detachMouseMove, {
-                        once: true,
-                });
+
+                pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+                if (pointers.size === 1) {
+                        startvp = kit.viewport();
+                }
+
+                if (pointers.size === 2) {
+                        const [p1, p2] = Array.from(pointers.values());
+                        if (p1 && p2) {
+                                iniPinx = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                        }
+                }
+
+                window.addEventListener("pointermove", onPointerMove);
+                window.addEventListener("pointerup", onPointerUp);
+                window.addEventListener("pointercancel", onPointerUp);
         };
 
-        const detachMouseMove = () => {
-                if (kit.viewport() !== startViewpoint) kit.updateViewport();
-                window.removeEventListener("mousemove", attachMouseMove);
+        const onPointerMove = (e: PointerEvent) => {
+                if (!pointers.has(e.pointerId)) return;
+
+                const prevPointer = pointers.get(e.pointerId);
+                if (!prevPointer) return;
+
+                pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+                if (pointers.size === 2 && iniPinx > 0) {
+                        e.preventDefault();
+
+                        const [p1, p2] = Array.from(pointers.values());
+                        if (!p1 || !p2) return;
+
+                        const currentDist = Math.hypot(
+                                p1.x - p2.x,
+                                p1.y - p2.y,
+                        );
+
+                        const scale = currentDist / iniPinx;
+                        const zoom = Math.max(
+                                0.1,
+                                Math.min(5, startvp.zoom * scale),
+                        );
+
+                        const centerX = (p1.x + p2.x) / 2;
+                        const centerY = (p1.y + p2.y) / 2;
+
+                        const rect = containerRef?.getBoundingClientRect();
+                        if (!rect) return;
+
+                        const cursorX = centerX - rect.left;
+                        const cursorY = centerY - rect.top;
+
+                        const x =
+                                cursorX -
+                                (cursorX - startvp.x) * (zoom / startvp.zoom);
+                        const y =
+                                cursorY -
+                                (cursorY - startvp.y) * (zoom / startvp.zoom);
+
+                        kit.setViewport({ zoom, x, y });
+                } else if (pointers.size === 1) {
+                        const dx = e.clientX - prevPointer.x;
+                        const dy = e.clientY - prevPointer.y;
+
+                        const prev = kit.viewport();
+                        kit.setViewport({
+                                ...prev,
+                                x: prev.x + dx,
+                                y: prev.y + dy,
+                        });
+                }
+        };
+
+        const onPointerUp = (e: PointerEvent) => {
+                pointers.delete(e.pointerId);
+
+                if (pointers.size === 0) {
+                        if (startvp !== kit.viewport()) {
+                                kit.updateViewport();
+                        }
+                        window.removeEventListener(
+                                "pointermove",
+                                onPointerMove,
+                        );
+                        window.removeEventListener("pointerup", onPointerUp);
+                        window.removeEventListener(
+                                "pointercancel",
+                                onPointerUp,
+                        );
+                        iniPinx = 0;
+                }
         };
 
         const onWheel = (e: WheelEvent & { currentTarget: HTMLDivElement }) => {
@@ -84,17 +161,17 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         };
 
         const onScrollEnd = () => {
-                if (startViewpoint !== kit.viewport()) {
+                if (startvp !== kit.viewport()) {
                         kit.updateViewport();
-                        startViewpoint = kit.viewport();
+                        startvp = kit.viewport();
                 }
         };
 
         let containerRef!: HTMLDivElement;
         const updateRect = () => {
                 if (containerRef) {
-                        kit.containerRect =
-                                containerRef.getBoundingClientRect();
+                        // console.log("deb");
+                        kit.container = containerRef;
                 }
         };
 
@@ -116,215 +193,86 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         kit.updateConnections();
                 }
         };
-        ///
-        let touchCache: Touch[] = [];
-        let pinchStartDist = 0;
-        let pinchStartZoom = 1;
-        let initialViewport = { x: 0, y: 0, zoom: 1 };
-        const getDistance = (touches: TouchList) => {
-                const [t1, t2] = touches;
-                if (!t1 || !t2) return 0;
-                return Math.hypot(
-                        t1.clientX - t2.clientX,
-                        t1.clientY - t2.clientY,
-                );
-        };
-        const onTouchStart = (
-                e: TouchEvent & { currentTarget: HTMLDivElement },
-        ) => {
-                if (kit.focus()) return;
-                if ((e.target as HTMLElement).closest(".node")) return;
-                for (const touch of Array.from(e.touches)) {
-                        const el = document.elementFromPoint(
-                                touch.clientX,
-                                touch.clientY,
-                        );
-                        if (el?.closest(".node")) {
-                                return;
-                        }
-                }
-                if (e.touches.length > 1) {
-                        e.preventDefault();
-                }
-                initialViewport = kit.viewport();
-                touchCache = Array.from(e.touches);
-                // z
-                if (e.touches.length === 2) {
-                        pinchStartDist = getDistance(e.touches);
-                        pinchStartZoom = initialViewport.zoom;
-                }
-                window.addEventListener("touchmove", onTouchMove, {
-                        passive: false,
-                });
-                window.addEventListener("touchend", onTouchEnd, { once: true });
-                window.addEventListener("touchcancel", onTouchEnd, {
-                        once: true,
-                });
-        };
-        const onTouchMove = (e: TouchEvent) => {
-                const currentTouches = Array.from(e.touches);
-                const touchCount = currentTouches.length;
-                // zomming
-                if (touchCount === 2) {
-                        e.preventDefault();
-                        const dist = getDistance(e.touches);
-                        const scale = dist / pinchStartDist;
-                        const zoom = Math.max(
-                                0.1,
-                                Math.min(5, pinchStartZoom * scale),
-                        );
-                        const rect = (
-                                e.currentTarget as HTMLDivElement
-                        ).getBoundingClientRect();
-                        const centerX =
-                                (currentTouches[0]!.clientX +
-                                        currentTouches[1]!.clientX) /
-                                2;
-                        const centerY =
-                                (currentTouches[0]!.clientY +
-                                        currentTouches[1]!.clientY) /
-                                2;
-                        const cursorX = centerX - rect.left;
-                        const cursorY = centerY - rect.top;
-                        const x =
-                                cursorX -
-                                (cursorX - initialViewport.x) *
-                                (zoom / initialViewport.zoom);
-                        const y =
-                                cursorY -
-                                (cursorY - initialViewport.y) *
-                                (zoom / initialViewport.zoom);
-                        kit.setViewport({
-                                zoom,
-                                x,
-                                y,
-                        });
-                        return;
-                }
-                // dragging
-                if (touchCount === 1) {
-                        e.preventDefault();
-                        const currentTouch = currentTouches[0];
-                        const previousTouch = touchCache[0];
-                        if (previousTouch) {
-                                const dx =
-                                        currentTouch!.clientX -
-                                        previousTouch.clientX;
-                                const dy =
-                                        currentTouch!.clientY -
-                                        previousTouch.clientY;
-                                const prev = kit.viewport();
-                                kit.setViewport({
-                                        ...prev,
-                                        x: prev.x + dx,
-                                        y: prev.y + dy,
-                                });
-                        }
-                }
-                touchCache = currentTouches;
-        };
-
-        const onTouchEnd = () => {
-                if (kit.viewport() !== initialViewport) {
-                        kit.updateViewport();
-                }
-                window.removeEventListener("touchmove", onTouchMove);
-                window.removeEventListener("touchend", onTouchEnd);
-                window.removeEventListener("touchcancel", onTouchEnd);
-                touchCache = [];
-                pinchStartDist = 0;
-                pinchStartZoom = 1;
-        };
 
         onMount(() => {
                 window.addEventListener("scrollend", onScrollEnd);
                 updateRect();
-                window.addEventListener("resize", updateRect);
                 window.addEventListener("keydown", onKeyDown);
         });
 
         onCleanup(() => {
                 window.removeEventListener("scrollend", onScrollEnd);
-                window.removeEventListener("mousemove", attachMouseMove);
-                window.removeEventListener("resize", updateRect);
+                window.removeEventListener("pointermove", onPointerMove);
+                window.removeEventListener("pointerup", onPointerUp);
+                window.removeEventListener("pointercancel", onPointerUp);
                 window.removeEventListener("keydown", onKeyDown);
-                window.removeEventListener("touchmove", onTouchMove);
         });
 
         return (
-                <KitContext.Provider value={kit}>
+                <div
+                        ref={containerRef}
+                        class="solid-kitx"
+                        style={{
+                                "--bg-vp-zoom": `${vp().zoom * 1.2}px`,
+                                "background-size": `${gridSize * vp().zoom}px ${
+                                        gridSize * vp().zoom
+                                }px`,
+                                "background-position": `${vp().x}px ${
+                                        vp().y
+                                }px`,
+                                "background-repeat": "repeat",
+                        }}
+                        onpointerdown={onPointerDown}
+                        onwheel={onWheel}
+                >
                         <div
-                                ref={containerRef}
-                                class="solid-kitx"
+                                class="container"
                                 style={{
-                                        "--bg-vp-zoom": `${vp().zoom * 1.2}px`,
-                                        "background-size": `${gridSize * vp().zoom
-                                                }px ${gridSize * vp().zoom}px`,
-                                        "background-position": `${vp().x}px ${vp().y
-                                                }px`,
-                                        "background-repeat": "repeat",
+                                        "transform-origin": "0 0",
+                                        transform: `translate(${vp().x}px, ${
+                                                vp().y
+                                        }px) scale(${vp().zoom})`,
+                                        position: "relative",
                                 }}
-                                onmousedown={onMouseDown}
-                                onwheel={onWheel}
-                                ontouchstart={onTouchStart}
-                                ontouchmove={(e) => e.preventDefault()}
                         >
-                                <div
-                                        class="container"
-                                        style={{
-                                                "transform-origin": "0 0",
-                                                transform: `translate(${vp().x
-                                                        }px, ${vp().y}px) scale(${vp().zoom
-                                                        })`,
-                                                position: "relative",
-                                        }}
-                                >
-                                        <Show when={kit.focus()}>
-                                                <DragSelect
-                                                        containerRef={
-                                                                containerRef
+                                <Show when={kit.focus()}>
+                                        <DragSelect kit={kit} />
+                                </Show>
+                                <For each={kit.connections}>
+                                        {(connection) => (
+                                                <ConnectionComponent
+                                                        connection={connection}
+                                                        Toolbar={
+                                                                props
+                                                                        .components?.[
+                                                                        "connection-toolbar"
+                                                                ]
                                                         }
                                                         kit={kit}
                                                 />
-                                        </Show>
-                                        <For each={kit.connections}>
-                                                {(connection) => (
-                                                        <ConnectionComponent
-                                                                connection={
-                                                                        connection
-                                                                }
-                                                                Toolbar={
-                                                                        props
-                                                                                .components?.[
-                                                                        "connection-toolbar"
-                                                                        ]
-                                                                }
-                                                        />
-                                                )}
-                                        </For>
+                                        )}
+                                </For>
 
-                                        <Show
-                                                when={kit.activeConnectionDestination()}
-                                        >
-                                                <ConnectionPreview kit={kit} />
-                                        </Show>
+                                <Show when={kit.activeConnectionDestination()}>
+                                        <ConnectionPreview kit={kit} />
+                                </Show>
 
-                                        <For each={kit.nodes}>
-                                                {(node) => (
-                                                        <NodeComponent
-                                                                node={node}
-                                                                components={
-                                                                        props.components
-                                                                }
-                                                        />
-                                                )}
-                                        </For>
-                                </div>
-                                {typeof props.children === "function"
-                                        ? props.children(kit)
-                                        : props.children}
-                                <Controls kit={kit} />
+                                <For each={kit.nodes}>
+                                        {(node) => (
+                                                <NodeComponent
+                                                        node={node}
+                                                        components={
+                                                                props.components
+                                                        }
+                                                        kit={kit}
+                                                />
+                                        )}
+                                </For>
                         </div>
-                </KitContext.Provider>
+                        {typeof props.children === "function"
+                                ? props.children(kit)
+                                : props.children}
+                        <Controls kit={kit} />
+                </div>
         );
 };

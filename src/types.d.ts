@@ -113,7 +113,7 @@ export interface Kit {
 
         activeConnection: ActiveConnectionType;
 
-        containerRect: DOMRect | null;
+        container: HTMLDivElement | null;
 
         gridSize: () => number;
 

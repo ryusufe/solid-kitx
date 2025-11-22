@@ -3,11 +3,10 @@ import { Kit } from "src/types";
 import { createDragHandler, clientToCanvasCoords } from "../lib/eventUtils";
 
 interface props {
-        containerRef: HTMLDivElement;
         kit: Kit;
 }
 
-const DragSelect: Component<props> = ({ containerRef, kit }) => {
+const DragSelect: Component<props> = ({ kit }) => {
         const [isDragging, setIsDragging] = createSignal(false);
         let startPos = { x: 0, y: 0 };
         const [currentPos, setCurrentPos] = createSignal({ x: 0, y: 0 });
@@ -27,12 +26,12 @@ const DragSelect: Component<props> = ({ containerRef, kit }) => {
 
         function detectSelection() {
                 const r = rect();
-                const bounds = containerRef.getBoundingClientRect();
+                const bounds = kit.container!.getBoundingClientRect();
 
                 const hits: string[] = [];
 
                 const elements =
-                        containerRef.querySelectorAll<HTMLElement>(
+                        kit.container!.querySelectorAll<HTMLElement>(
                                 ".node, .connection",
                         );
 
@@ -70,22 +69,13 @@ const DragSelect: Component<props> = ({ containerRef, kit }) => {
 
         const dragHandler = createDragHandler<{ x: number; y: number }>({
                 onStart: (e) => {
-                        if (e instanceof MouseEvent && e.button !== 0) return;
-
-                        const clientX =
-                                e instanceof MouseEvent
-                                        ? e.clientX
-                                        : e.touches[0]!.clientX;
-                        const clientY =
-                                e instanceof MouseEvent
-                                        ? e.clientY
-                                        : e.touches[0]!.clientY;
+                        if (e.button !== 0) return;
 
                         const coords = clientToCanvasCoords(
-                                clientX,
-                                clientY,
+                                e.clientX,
+                                e.clientY,
                                 kit.viewport(),
-                                containerRef.getBoundingClientRect(),
+                                kit.container!.getBoundingClientRect(),
                         );
 
                         if (!coords) return;
@@ -96,20 +86,11 @@ const DragSelect: Component<props> = ({ containerRef, kit }) => {
                         return coords;
                 },
                 onMove: (e, _) => {
-                        const clientX =
-                                e instanceof MouseEvent
-                                        ? e.clientX
-                                        : e.touches[0]!.clientX;
-                        const clientY =
-                                e instanceof MouseEvent
-                                        ? e.clientY
-                                        : e.touches[0]!.clientY;
-
                         const coords = clientToCanvasCoords(
-                                clientX,
-                                clientY,
+                                e.clientX,
+                                e.clientY,
                                 kit.viewport(),
-                                containerRef.getBoundingClientRect(),
+                                kit.container!.getBoundingClientRect(),
                         );
 
                         if (!coords) return;
@@ -124,18 +105,16 @@ const DragSelect: Component<props> = ({ containerRef, kit }) => {
         });
 
         onMount(() => {
-                window.addEventListener("mousedown", dragHandler.onMouseDown);
-                window.addEventListener("touchstart", dragHandler.onTouchStart);
+                window.addEventListener(
+                        "pointerdown",
+                        dragHandler.onPointerDown,
+                );
         });
 
         onCleanup(() => {
                 window.removeEventListener(
-                        "mousedown",
-                        dragHandler.onMouseDown,
-                );
-                window.removeEventListener(
-                        "touchstart",
-                        dragHandler.onTouchStart,
+                        "pointerdown",
+                        dragHandler.onPointerDown,
                 );
         });
 
