@@ -6,10 +6,10 @@ import {
         NodeType,
         ViewPort,
 } from "./types";
-import { NodeComponent } from "./Node/NodeComponent";
-import { createKit } from "./lib/createKit";
-import ConnectionComponent from "./Connection/ConnectionComponent";
-import ConnectionPreview from "./Connection/ConnectionPreview";
+import Node from "./components/Node/Node";
+import { createKit } from "./core/createKit";
+import Connection from "./components/Connection/Connection";
+import ConnectionPreview from "./components/Connection/ConnectionPreview";
 import DragSelect from "./components/DragSelect";
 
 export interface SolidKitProps {
@@ -230,7 +230,7 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                 </Show>
                                 <For each={kit.connections}>
                                         {(connection) => (
-                                                <ConnectionComponent
+                                                <Connection
                                                         connection={connection}
                                                         Toolbar={
                                                                 props
@@ -249,7 +249,7 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
 
                                 <For each={kit.nodes}>
                                         {(node) => (
-                                                <NodeComponent
+                                                <Node
                                                         node={node}
                                                         components={
                                                                 props.components

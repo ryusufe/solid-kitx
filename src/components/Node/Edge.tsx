@@ -1,7 +1,7 @@
 import { Component, createMemo, Show } from "solid-js";
-import { Kit, NodeType, Position, ViewPort } from "src/types";
+import { Kit, NodeType, Position, ViewPort } from "../../types";
 import AnchorPoint from "./AnchorPoint";
-import { createDragHandler, calculateDelta } from "../lib/eventUtils";
+import { createDragHandler, calculateDelta } from "../../utils/events";
 
 export type EdgePosition = Position | "tr" | "tl" | "br" | "bl";
 
@@ -50,25 +50,25 @@ const Edge: Component<{
         const cornerAxes =
                 props.side === "tl"
                         ? [
-                                  { axis: "x", sign: -1 },
-                                  { axis: "y", sign: -1 },
-                          ]
+                                { axis: "x", sign: -1 },
+                                { axis: "y", sign: -1 },
+                        ]
                         : props.side === "tr"
-                        ? [
-                                  { axis: "x", sign: 1 },
-                                  { axis: "y", sign: -1 },
-                          ]
-                        : props.side === "bl"
-                        ? [
-                                  { axis: "x", sign: -1 },
-                                  { axis: "y", sign: 1 },
-                          ]
-                        : props.side === "br"
-                        ? [
-                                  { axis: "x", sign: 1 },
-                                  { axis: "y", sign: 1 },
-                          ]
-                        : [];
+                                ? [
+                                        { axis: "x", sign: 1 },
+                                        { axis: "y", sign: -1 },
+                                ]
+                                : props.side === "bl"
+                                        ? [
+                                                { axis: "x", sign: -1 },
+                                                { axis: "y", sign: 1 },
+                                        ]
+                                        : props.side === "br"
+                                                ? [
+                                                        { axis: "x", sign: 1 },
+                                                        { axis: "y", sign: 1 },
+                                                ]
+                                                : [];
 
         const axes = isCorner ? cornerAxes : [single];
 
@@ -83,21 +83,21 @@ const Edge: Component<{
 
                 return isCorner
                         ? {
-                                  width: thickness,
-                                  height: thickness,
-                                  cursor,
-                          }
+                                width: thickness,
+                                height: thickness,
+                                cursor,
+                        }
                         : {
-                                  width:
-                                          single.axis === "y"
-                                                  ? "100%"
-                                                  : thickness,
-                                  height:
-                                          single.axis === "y"
-                                                  ? thickness
-                                                  : "100%",
-                                  cursor,
-                          };
+                                width:
+                                        single.axis === "y"
+                                                ? "100%"
+                                                : thickness,
+                                height:
+                                        single.axis === "y"
+                                                ? thickness
+                                                : "100%",
+                                cursor,
+                        };
         });
 
         const dragHandler = createDragHandler<{
@@ -130,17 +130,17 @@ const Edge: Component<{
                                 const delta =
                                         a.axis === "x"
                                                 ? calculateDelta(
-                                                          e.clientX,
-                                                          startNode.clientX,
-                                                          zoom,
-                                                          gridSize,
-                                                  )
+                                                        e.clientX,
+                                                        startNode.clientX,
+                                                        zoom,
+                                                        gridSize,
+                                                )
                                                 : calculateDelta(
-                                                          e.clientY,
-                                                          startNode.clientY,
-                                                          zoom,
-                                                          gridSize,
-                                                  );
+                                                        e.clientY,
+                                                        startNode.clientY,
+                                                        zoom,
+                                                        gridSize,
+                                                );
                                 const diff = delta * a.sign;
 
                                 if (a.axis === "x") {

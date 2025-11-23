@@ -1,12 +1,10 @@
 import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { Position, Kit } from "../types";
-import { SolidKitProps } from "../SolidKitx";
-
-export type ActiveConnectionType = Partial<{
-        from: { id: string; side: Position };
-        to: { id: string; side: Position };
-}>;
+import {
+        type Kit,
+        type SolidKitProps,
+        type ActiveConnectionType,
+} from "../types";
 
 export const createKit = (props: SolidKitProps): Kit => {
         const [nodes, setNodes] = createStore(props.nodes || []);

@@ -1,4 +1,4 @@
-import "./main.css";
+import "./styles/index.css";
 export { SolidKitx } from "./SolidKitx";
 export { BackgroundGrid } from "./components/BackgroundGrid";
 export { Controls } from "./components/Controls";

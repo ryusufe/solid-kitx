@@ -5,15 +5,15 @@ import {
         ConnectionToolbarProps,
         ConnectionType,
         Kit,
-} from "../types";
-import { createPath } from "../lib/GetPath";
+} from "../../types";
+import { createPath } from "../../utils/path";
 
 export interface ConnectionProps {
         connection: ConnectionType;
         Toolbar?: Component<ConnectionToolbarProps>;
         kit: Kit;
 }
-const ConnectionComponent: Component<ConnectionProps> = (props) => {
+const Connection: Component<ConnectionProps> = (props) => {
         let connectionRef!: SVGPathElement;
         let toolbarRef!: HTMLDivElement;
         const kit = props.kit;
@@ -240,4 +240,4 @@ const ConnectionComponent: Component<ConnectionProps> = (props) => {
         );
 };
 
-export default ConnectionComponent;
+export default Connection;

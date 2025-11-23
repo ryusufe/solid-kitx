@@ -165,6 +165,12 @@
         background-color: var(--bg-color, #121212);
         background-image: radial-gradient(circle, var(--dots-color, #2e2e2e) var(--bg-vp-zoom), transparent 1px);
 
+        .background-grid {
+                circle {
+                        color: var(--dots-color, #303030)
+                }
+        }
+
         .container {
                 transform-origin: 0 0;
                 width: 100%;

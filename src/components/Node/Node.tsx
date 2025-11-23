@@ -1,8 +1,8 @@
 import { createEffect, createMemo, For, onCleanup, Show } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import type { ComponentsType, Kit, NodeType } from "../types";
+import type { ComponentsType, Kit, NodeType } from "../../types";
 import Edge, { EdgePosition } from "./Edge";
-import { createDragHandler, calculateDelta } from "../lib/eventUtils";
+import { createDragHandler, calculateDelta } from "../../utils/events";
 
 interface NodeProps {
         node: NodeType;
@@ -10,7 +10,7 @@ interface NodeProps {
         kit: Kit;
 }
 
-export const NodeComponent = ({ node, components = {}, kit }: NodeProps) => {
+const Node = ({ node, components = {}, kit }: NodeProps) => {
         const gridSize = createMemo(() => kit.gridSize());
         const type = createMemo(() => node.data?.component?.type);
         const hasComponent = createMemo<boolean>(() =>
@@ -274,3 +274,5 @@ export const NodeComponent = ({ node, components = {}, kit }: NodeProps) => {
                 </div>
         );
 };
+
+export default Node;

@@ -1,6 +1,6 @@
 import { Component, createMemo, onCleanup, onMount } from "solid-js";
-import { createPath } from "../lib/GetPath";
-import { Kit, Position } from "../types";
+import { createPath } from "../../utils/path";
+import { Kit, Position } from "../../types";
 
 const sides = ["top", "bottom", "left", "right"] as Position[];
 const ConnectionPreview: Component<{ kit: Kit }> = (props) => {
@@ -58,7 +58,6 @@ const ConnectionPreview: Component<{ kit: Kit }> = (props) => {
                                         d={path()}
                                         fill="none"
                                         style={{
-                                                //transition: "all 0.1s",
                                                 "stroke-width":
                                                         "var(--connection-width, 2)",
                                         }}

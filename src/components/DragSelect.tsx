@@ -1,6 +1,6 @@
 import { createSignal, Component, Show, onMount, onCleanup } from "solid-js";
-import { Kit } from "src/types";
-import { createDragHandler, clientToCanvasCoords } from "../lib/eventUtils";
+import { Kit } from "../types";
+import { createDragHandler, clientToCanvasCoords } from "../utils/events";
 
 interface props {
         kit: Kit;

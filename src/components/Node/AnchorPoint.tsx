@@ -4,8 +4,8 @@ import {
         disableUserSelect,
         enableUserSelect,
         clientToCanvasCoords,
-} from "../lib/eventUtils";
-import { ConnectionType, NodeType, Position, Kit } from "../types";
+} from "../../utils/events";
+import { ConnectionType, NodeType, Position, Kit } from "../../types";
 
 const sides: Position[] = ["left", "right", "top", "bottom"];
 

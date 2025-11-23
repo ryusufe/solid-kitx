@@ -1,5 +1,5 @@
 import { Component } from "solid-js";
-import { Kit } from "src/types";
+import { Kit } from "../types";
 
 export const Controls: Component<{ kit: Kit }> = ({ kit }) => {
         const zoomIn = () => {
