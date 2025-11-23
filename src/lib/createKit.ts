@@ -1,8 +1,7 @@
 import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
-import { SolidKitProps, Position, Kit } from "../types";
-
-//export type KitStore = ReturnType<typeof createKit>;
+import { Position, Kit } from "../types";
+import { SolidKitProps } from "../SolidKitx";
 
 export type ActiveConnectionType = Partial<{
         from: { id: string; side: Position };
@@ -24,7 +23,7 @@ export const createKit = (props: SolidKitProps): Kit => {
         const [activeConnectionDestination, setActiveConnectionDestination] =
                 createSignal<{ x: number; y: number } | null>(null);
 
-        const gridSize = () => props.gridSize ?? 30;
+        const [gridSize, setGridSize] = createSignal(props.gridSize ?? 30);
 
         const updateNodes = () => props.onNodesChange?.(nodes);
         const updateConnections = () =>
@@ -50,9 +49,11 @@ export const createKit = (props: SolidKitProps): Kit => {
                 activeConnection: {} as ActiveConnectionType,
                 container: null as HTMLDivElement | null,
                 gridSize,
+                setGridSize,
                 updateNodes,
                 updateConnections,
                 updateViewport,
                 randomId,
+                defaultNode: props.defaultNode,
         };
 };

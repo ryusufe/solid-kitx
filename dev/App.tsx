@@ -1,5 +1,5 @@
 import { createSignal, type Component } from "solid-js";
-import { SolidKitx } from "solid-kitx";
+import { BackgroundGrid, Controls, Kit, SolidKitx } from "solid-kitx";
 import { ConnectionType, NodeType, ViewPort } from "solid-kitx";
 import "./styles.css";
 import { render } from "solid-js/web";
@@ -8,6 +8,7 @@ import ConnectionToolbar from "./components/ConnectionToolbar";
 import TopRightQA from "./components/TopRightQA";
 import ExampleMarkdown from "./components/ExampleMarkdown";
 import ExampleStatus from "./components/ExampleStatus";
+import { Part } from "solid-js/store";
 //import "solid-kitx/index.css";
 
 interface DataType {
@@ -18,14 +19,12 @@ interface DataType {
 }
 
 const App: Component = () => {
-        const [nodes, setNodes] = createSignal<DataType["nodes"]>(
-                DEFAULT.nodes,
-        );
+        const [nodes, setNodes] = createSignal<DataType["nodes"]>(data.nodes);
         const [connections, setConnections] = createSignal<
                 DataType["connections"]
-        >(DEFAULT.connections);
+        >(data.connections);
         const [viewport, setViewport] = createSignal<DataType["viewport"]>(
-                DEFAULT.viewport,
+                data.viewport,
         );
 
         const onNodesChange = () => {
@@ -58,7 +57,8 @@ const App: Component = () => {
                                 onConnectionsChange={onConnectionsChange}
                                 viewport={viewport()}
                                 onViewportChange={onViewportChange}
-                                gridSize={DEFAULT.gridSize}
+                                gridSize={1}
+                                defaultNode={defaultNode}
                                 components={{
                                         "node-toolbar": NodeToolbar,
                                         "connection-toolbar": ConnectionToolbar,
@@ -66,13 +66,26 @@ const App: Component = () => {
                                         "example-status": ExampleStatus,
                                 }}
                         >
-                                <TopRightQA />
+                                {(kit: Kit) => (
+                                        <>
+                                                <TopRightQA />
+                                                <Controls kit={kit} />
+                                                <BackgroundGrid
+                                                        kit={kit}
+                                                        absoluteGrid={30}
+                                                />
+                                        </>
+                                )}
                         </SolidKitx>
                 </div>
         );
 };
+const defaultNode: Partial<NodeType> = {
+        width: 150,
+        height: 60,
+};
 
-const DEFAULT: DataType = {
+const data: DataType = {
         nodes: [
                 {
                         id: "node-1",
@@ -81,7 +94,7 @@ const DEFAULT: DataType = {
                         width: 210,
                         height: 300,
                         data: {
-                                label: "Outline Changer",
+                                label: "Color Changer",
                                 component: { type: "example-status" },
                         },
                         style: { "outline-color": "#272727" },

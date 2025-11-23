@@ -162,7 +162,6 @@ const ConnectionComponent: Component<ConnectionProps> = (props) => {
                                 <g
                                         ref={connectionRef}
                                         id={props.connection.id}
-                                        tabindex={"0"}
                                         class={`connection ${
                                                 props.connection.class ?? ""
                                         }`}
@@ -176,9 +175,7 @@ const ConnectionComponent: Component<ConnectionProps> = (props) => {
                                         <path
                                                 d={path()}
                                                 fill="none"
-                                                style={{
-                                                        transition: "all 0.1s",
-                                                }}
+                                                style={""}
                                         />
                                         <path
                                                 d={path()}

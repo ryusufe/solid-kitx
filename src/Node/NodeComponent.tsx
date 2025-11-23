@@ -46,6 +46,8 @@ export const NodeComponent = ({ node, components = {}, kit }: NodeProps) => {
                 y: number;
                 clientX: number;
                 clientY: number;
+                zoom: number;
+                gridSize: number;
         }>({
                 onStart: (e) => {
                         setSelected(true);
@@ -59,24 +61,25 @@ export const NodeComponent = ({ node, components = {}, kit }: NodeProps) => {
                                 y: node.y,
                                 clientX: e.clientX,
                                 clientY: e.clientY,
+                                zoom: kit.viewport().zoom,
+                                gridSize: gridSize(),
                         };
                 },
                 onMove: (e, startData) => {
                         const clientX = e.clientX;
                         const clientY = e.clientY;
 
-                        const zoom = kit.viewport().zoom;
                         const dx = calculateDelta(
                                 clientX,
                                 startData.clientX,
-                                zoom,
-                                gridSize(),
+                                startData.zoom,
+                                startData.gridSize,
                         );
                         const dy = calculateDelta(
                                 clientY,
                                 startData.clientY,
-                                zoom,
-                                gridSize(),
+                                startData.zoom,
+                                startData.gridSize,
                         );
 
                         const x = startData.x + dx;
@@ -106,7 +109,7 @@ export const NodeComponent = ({ node, components = {}, kit }: NodeProps) => {
 
                 if (selected()) {
                         nodeDiv.focus();
-                        window.addEventListener("mousedown", onClickOutside, {
+                        window.addEventListener("pointerdown", onClickOutside, {
                                 signal: controller.signal,
                         });
                         window.addEventListener("keydown", onKeyDown, {
@@ -121,7 +124,10 @@ export const NodeComponent = ({ node, components = {}, kit }: NodeProps) => {
                 const target = e.target as Node;
                 if (nodeDiv && !nodeDiv.contains(target) && !e.ctrlKey) {
                         setSelected(false);
-                        window.removeEventListener("mousedown", onClickOutside);
+                        window.removeEventListener(
+                                "pointerdown",
+                                onClickOutside,
+                        );
                         window.removeEventListener("keydown", onKeyDown);
                 }
         };
@@ -142,13 +148,11 @@ export const NodeComponent = ({ node, components = {}, kit }: NodeProps) => {
                         class={`node ${node.class ?? ""} `}
                         classList={{ selected: selected() }}
                         id={node.id}
-                        tabIndex={"0"}
                         onpointerdown={onPointerDown}
                         style={{
-                                left: `${node.x}px`,
-                                top: `${node.y}px`,
-                                width: `${node.width || 4 * gridSize()}px`,
-                                height: `${node.height || 2 * gridSize()}px`,
+                                transform: `translate(${node.x}px, ${node.y}px)`,
+                                width: `${node.width}px`,
+                                height: `${node.height}px`,
                                 cursor: kit.focus() ? "auto" : "grab",
                                 ...node.style,
                         }}

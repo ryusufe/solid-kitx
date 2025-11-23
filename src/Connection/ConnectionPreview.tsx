@@ -58,7 +58,7 @@ const ConnectionPreview: Component<{ kit: Kit }> = (props) => {
                                         d={path()}
                                         fill="none"
                                         style={{
-                                                transition: "all 0.1s",
+                                                //transition: "all 0.1s",
                                                 "stroke-width":
                                                         "var(--connection-width, 2)",
                                         }}

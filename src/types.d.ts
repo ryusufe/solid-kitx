@@ -75,21 +75,6 @@ export type ActiveConnectionType = Partial<{
 
 export type Viewport = ViewPort;
 
-export interface SolidKitProps {
-        nodes: NodeType[];
-        connections: ConnectionType[];
-        viewport: ViewPort;
-        onViewportChange: (vp: ViewPort) => void;
-        onNodesChange: (nodes: NodeType[]) => void;
-        onConnectionsChange: (connections: ConnectionType[]) => void;
-        gridSize?: number;
-        width?: number;
-        height?: number;
-        class?: string;
-        children?: JSX.Element | ((kit: Kit) => JSX.Element);
-        components?: ComponentsType;
-}
-
 // props
 
 export interface Kit {
@@ -99,7 +84,7 @@ export interface Kit {
         connections: ConnectionType[];
         setConnections: SetStoreFunction<ConnectionType[]>;
 
-        viewport: () => Viewport;
+        viewport: Accessor<Viewport>;
         setViewport: Setter<Viewport>;
 
         focus: Accessor<boolean>;
@@ -115,7 +100,10 @@ export interface Kit {
 
         container: HTMLDivElement | null;
 
-        gridSize: () => number;
+        gridSize: Accessor<number>;
+        setGridSize: Setter<number>;
+
+        defaultNode?: Partial<NodeType>;
 
         updateNodes: () => void;
         updateConnections: () => void;

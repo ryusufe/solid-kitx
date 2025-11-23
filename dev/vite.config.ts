@@ -5,8 +5,14 @@ import solidPlugin from "vite-plugin-solid";
 export default defineConfig({
         resolve: {
                 alias: {
-                        "solid-kitx": path.resolve(__dirname, "../src"),
+                        "solid-kitx": path.resolve(
+                                __dirname,
+                                "../src/index.tsx",
+                        ),
                 },
+                dedupe: ["solid-js", "solid-js/web", "solid-js/store"],
+                conditions: ["development", "browser"],
+                preserveSymlinks: false,
         },
         base: "/solid-kitx/",
         plugins: [

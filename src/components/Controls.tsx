@@ -1,6 +1,7 @@
+import { Component } from "solid-js";
 import { Kit } from "src/types";
 
-export const Controls = ({ kit }: { kit: Kit }) => {
+export const Controls: Component<{ kit: Kit }> = ({ kit }) => {
         const zoomIn = () => {
                 const prev = kit.viewport();
                 const zoomPer = Math.min(5, prev.zoom + 0.1);

@@ -45,21 +45,35 @@ const AnchorPoint: Component<{
                                 const dest = kit.activeConnectionDestination();
                                 const gridSize = props.kit.gridSize();
                                 if (dest) {
-                                        const x = snapToGrid(dest.x, gridSize);
+                                        const x = snapToGrid(
+                                                dest.x - 75,
+                                                gridSize,
+                                        );
                                         const y = snapToGrid(dest.y, gridSize);
+                                        const widthUnits = Math.round(
+                                                150 / gridSize,
+                                        );
+                                        const heightUnits = Math.round(
+                                                60 / gridSize,
+                                        );
                                         const id = kit.randomId("node");
                                         const node: NodeType = {
-                                                id,
                                                 x,
                                                 y,
-                                                width: 5 * kit.gridSize(),
-                                                height: 2 * kit.gridSize(),
+                                                width:
+                                                        widthUnits *
+                                                        kit.gridSize(),
+                                                height:
+                                                        heightUnits *
+                                                        kit.gridSize(),
                                                 data: {
                                                         label: "Node",
                                                         component: {
                                                                 type: "default",
                                                         },
                                                 },
+                                                ...kit.defaultNode,
+                                                id,
                                         };
                                         kit.setNodes([...kit.nodes, node]);
                                         kit.updateNodes();

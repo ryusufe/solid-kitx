@@ -1,5 +1,5 @@
 import { Component, createMemo, Show } from "solid-js";
-import { Kit, NodeType, Position } from "src/types";
+import { Kit, NodeType, Position, ViewPort } from "src/types";
 import AnchorPoint from "./AnchorPoint";
 import { createDragHandler, calculateDelta } from "../lib/eventUtils";
 
@@ -107,6 +107,8 @@ const Edge: Component<{
                 y: number;
                 clientX: number;
                 clientY: number;
+                vp: ViewPort;
+                gridSize: number;
         }>({
                 onStart: (e) => {
                         return {
@@ -116,27 +118,28 @@ const Edge: Component<{
                                 y: props.node.y,
                                 clientX: e.clientX,
                                 clientY: e.clientY,
+                                vp: props.kit.viewport(),
+                                gridSize: props.kit.gridSize(),
                         };
                 },
                 onMove: (e, startNode) => {
-                        let { width, height, x, y } = startNode;
+                        let { width, height, x, y, vp, gridSize } = startNode;
 
                         for (const a of axes) {
-                                const zoom = props.kit.viewport().zoom;
-                                const grid = props.kit.gridSize();
+                                const zoom = vp.zoom;
                                 const delta =
                                         a.axis === "x"
                                                 ? calculateDelta(
                                                           e.clientX,
                                                           startNode.clientX,
                                                           zoom,
-                                                          grid,
+                                                          gridSize,
                                                   )
                                                 : calculateDelta(
                                                           e.clientY,
                                                           startNode.clientY,
                                                           zoom,
-                                                          grid,
+                                                          gridSize,
                                                   );
                                 const diff = delta * a.sign;
 

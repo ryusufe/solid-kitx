@@ -1,3 +1,4 @@
+html,
 body {
         background-color: black;
         margin: 0;
@@ -8,13 +9,18 @@ body {
         overscroll-behavior-y: none;
         overflow: hidden;
         height: 100%;
+        width: 100%;
 }
 
 code {
         font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+#root {
 
+        height: 100%;
+        width: 100%;
+}
 
 .solid-kitx {}
 

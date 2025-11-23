@@ -10,16 +10,16 @@ import { NodeComponent } from "./Node/NodeComponent";
 import { createKit } from "./lib/createKit";
 import ConnectionComponent from "./Connection/ConnectionComponent";
 import ConnectionPreview from "./Connection/ConnectionPreview";
-import { Controls } from "./components/Controls";
 import DragSelect from "./components/DragSelect";
 
-interface SolidKitProps {
+export interface SolidKitProps {
         nodes: NodeType[];
         connections: ConnectionType[];
         viewport: ViewPort;
         onViewportChange: (vp: ViewPort) => void;
         onNodesChange: (nodes: NodeType[]) => void;
         onConnectionsChange: (connections: ConnectionType[]) => void;
+        defaultNode?: Partial<NodeType>;
         gridSize?: number;
         width?: number;
         height?: number;
@@ -27,6 +27,7 @@ interface SolidKitProps {
         children?: JSX.Element | ((kit: Kit) => JSX.Element);
         components?: ComponentsType;
 }
+
 export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         const kit = createKit({ ...props, gridSize });
 
@@ -212,16 +213,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                 <div
                         ref={containerRef}
                         class="solid-kitx"
-                        style={{
-                                "--bg-vp-zoom": `${vp().zoom * 1.2}px`,
-                                "background-size": `${gridSize * vp().zoom}px ${
-                                        gridSize * vp().zoom
-                                }px`,
-                                "background-position": `${vp().x}px ${
-                                        vp().y
-                                }px`,
-                                "background-repeat": "repeat",
-                        }}
                         onpointerdown={onPointerDown}
                         onwheel={onWheel}
                 >
@@ -232,7 +223,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                         transform: `translate(${vp().x}px, ${
                                                 vp().y
                                         }px) scale(${vp().zoom})`,
-                                        position: "relative",
                                 }}
                         >
                                 <Show when={kit.focus()}>
@@ -272,7 +262,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         {typeof props.children === "function"
                                 ? props.children(kit)
                                 : props.children}
-                        <Controls kit={kit} />
                 </div>
         );
 };

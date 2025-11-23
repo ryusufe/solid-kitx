@@ -4,13 +4,19 @@
         overflow: hidden;
         position: relative;
         background-color: var(--bg-color, #F7F9FB);
-        background-image: radial-gradient(circle, var(--dots-color, #cccccc) var(--bg-vp-zoom), transparent 1px);
+
+        .background-grid {
+                circle {
+                        color: var(--dots-color, #cccccc)
+                }
+        }
 
         .container {
                 transform-origin: 0 0;
                 width: 100%;
                 height: 100%;
                 position: absolute;
+                z-index: 1000;
                 top: 0;
                 left: 0;
 
@@ -31,7 +37,6 @@
                         display: flex;
                         justify-content: center;
                         align-items: center;
-                        transition: all 0.1s;
 
                         .node-edge {
                                 --off-v: -7px;
@@ -184,7 +189,6 @@
                         display: flex;
                         justify-content: center;
                         align-items: center;
-                        transition: all 0.1s;
 
                         .node-edge {
                                 --off-v: -7px;
