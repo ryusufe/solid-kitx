@@ -1,5 +1,5 @@
 import { Component, createMemo, Show } from "solid-js";
-import { Kit, NodeType, Position, ViewPort } from "../../types";
+import { Kit, NodeType, Position, ViewPort, xy } from "../../types";
 import AnchorPoint from "./AnchorPoint";
 import { createDragHandler, calculateDelta } from "../../utils/events";
 
@@ -11,6 +11,22 @@ const Edge: Component<{
         kit: Kit;
 }> = (props) => {
         const isCorner = ["tl", "tr", "bl", "br"].includes(props.side);
+
+        const {
+                minNodeWidth = 1,
+                maxNodeWidth = 10000,
+                minNodeHeight = 1,
+                maxNodeHeight = 10000,
+        } = props.kit;
+
+        const clamp = (value: number, min: number, max: number) =>
+                Math.max(min, Math.min(value, max));
+
+        const getRespectedWidth = (value: number) =>
+                clamp(value, minNodeWidth, maxNodeWidth);
+        const getRespectedHeight = (value: number) =>
+                clamp(value, minNodeHeight, maxNodeHeight);
+
         const positionStyle = (() => {
                 switch (props.side) {
                         case "top":
@@ -50,25 +66,25 @@ const Edge: Component<{
         const cornerAxes =
                 props.side === "tl"
                         ? [
-                                { axis: "x", sign: -1 },
-                                { axis: "y", sign: -1 },
-                        ]
+                                  { axis: "x", sign: -1 },
+                                  { axis: "y", sign: -1 },
+                          ]
                         : props.side === "tr"
-                                ? [
-                                        { axis: "x", sign: 1 },
-                                        { axis: "y", sign: -1 },
-                                ]
-                                : props.side === "bl"
-                                        ? [
-                                                { axis: "x", sign: -1 },
-                                                { axis: "y", sign: 1 },
-                                        ]
-                                        : props.side === "br"
-                                                ? [
-                                                        { axis: "x", sign: 1 },
-                                                        { axis: "y", sign: 1 },
-                                                ]
-                                                : [];
+                        ? [
+                                  { axis: "x", sign: 1 },
+                                  { axis: "y", sign: -1 },
+                          ]
+                        : props.side === "bl"
+                        ? [
+                                  { axis: "x", sign: -1 },
+                                  { axis: "y", sign: 1 },
+                          ]
+                        : props.side === "br"
+                        ? [
+                                  { axis: "x", sign: 1 },
+                                  { axis: "y", sign: 1 },
+                          ]
+                        : [];
 
         const axes = isCorner ? cornerAxes : [single];
 
@@ -83,33 +99,33 @@ const Edge: Component<{
 
                 return isCorner
                         ? {
-                                width: thickness,
-                                height: thickness,
-                                cursor,
-                        }
+                                  width: thickness,
+                                  height: thickness,
+                                  cursor,
+                          }
                         : {
-                                width:
-                                        single.axis === "y"
-                                                ? "100%"
-                                                : thickness,
-                                height:
-                                        single.axis === "y"
-                                                ? thickness
-                                                : "100%",
-                                cursor,
-                        };
+                                  width:
+                                          single.axis === "y"
+                                                  ? "100%"
+                                                  : thickness,
+                                  height:
+                                          single.axis === "y"
+                                                  ? thickness
+                                                  : "100%",
+                                  cursor,
+                          };
         });
 
-        const dragHandler = createDragHandler<{
-                width: number;
-                height: number;
-                x: number;
-                y: number;
-                clientX: number;
-                clientY: number;
-                vp: ViewPort;
-                gridSize: number;
-        }>({
+        const dragHandler = createDragHandler<
+                {
+                        width: number;
+                        height: number;
+                        clientX: number;
+                        clientY: number;
+                        vp: ViewPort;
+                        gridSize: number;
+                } & xy
+        >({
                 onStart: (e) => {
                         return {
                                 width: props.node.width,
@@ -119,7 +135,7 @@ const Edge: Component<{
                                 clientX: e.clientX,
                                 clientY: e.clientY,
                                 vp: props.kit.viewport(),
-                                gridSize: props.kit.gridSize(),
+                                gridSize: props.kit.gridSize!,
                         };
                 },
                 onMove: (e, startNode) => {
@@ -130,36 +146,47 @@ const Edge: Component<{
                                 const delta =
                                         a.axis === "x"
                                                 ? calculateDelta(
-                                                        e.clientX,
-                                                        startNode.clientX,
-                                                        zoom,
-                                                        gridSize,
-                                                )
+                                                          e.clientX,
+                                                          startNode.clientX,
+                                                          zoom,
+                                                          gridSize,
+                                                  )
                                                 : calculateDelta(
-                                                        e.clientY,
-                                                        startNode.clientY,
-                                                        zoom,
-                                                        gridSize,
-                                                );
+                                                          e.clientY,
+                                                          startNode.clientY,
+                                                          zoom,
+                                                          gridSize,
+                                                  );
                                 const diff = delta * a.sign;
 
                                 if (a.axis === "x") {
-                                        width += diff;
+                                        let newWidth = width + diff;
+                                        const clampedWidth =
+                                                getRespectedWidth(newWidth);
+                                        const actualDiff = clampedWidth - width;
+
+                                        width = clampedWidth;
                                         if (
                                                 props.side === "left" ||
                                                 props.side === "tl" ||
                                                 props.side === "bl"
                                         ) {
-                                                x -= diff;
+                                                x -= actualDiff;
                                         }
                                 } else {
-                                        height += diff;
+                                        let newHeight = height + diff;
+                                        const clampedHeight =
+                                                getRespectedHeight(newHeight);
+                                        const actualDiff =
+                                                clampedHeight - height;
+
+                                        height = clampedHeight;
                                         if (
                                                 props.side === "top" ||
                                                 props.side === "tl" ||
                                                 props.side === "tr"
                                         ) {
-                                                y -= diff;
+                                                y -= actualDiff;
                                         }
                                 }
                         }
@@ -174,6 +201,7 @@ const Edge: Component<{
                                 },
                         );
                 },
+
                 onEnd: (_, startNode) => {
                         if (
                                 (["width", "height", "x", "y"] as const).some(
@@ -201,10 +229,11 @@ const Edge: Component<{
         };
 
         const onPointerLeave = () => {
-                const { from } = props.kit.activeConnection;
-                if (!from) return;
+                const act = props.kit.activeConnection;
+                if (!act.from) return;
                 props.kit.activeConnection = {
-                        from,
+                        ...act,
+                        to: { id: undefined, side: act.to?.side },
                 };
         };
 
@@ -217,7 +246,11 @@ const Edge: Component<{
                         }}
                         onpointerenter={onPinterEnter}
                         onpointerleave={onPointerLeave}
-                        onPointerDown={dragHandler.onPointerDown}
+                        onPointerDown={
+                                props.kit.disableEdgeDrag
+                                        ? undefined
+                                        : dragHandler.onPointerDown
+                        }
                 >
                         <Show when={!isCorner}>
                                 <AnchorPoint

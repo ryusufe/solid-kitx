@@ -1,6 +1,12 @@
-import { Position } from "../types";
+import { Position, xy } from "../types";
 
-type xy = { x: number; y: number };
+interface PathOptions {
+        start: xy;
+        startPos: Position;
+        end: xy;
+        endPos: Position;
+        curve?: number;
+}
 
 export function createPath({
         start,
@@ -8,13 +14,7 @@ export function createPath({
         end,
         endPos,
         curve = 9,
-}: {
-        start: xy;
-        startPos: Position;
-        end: xy;
-        endPos: Position;
-        curve?: number;
-}): string {
+}: PathOptions): string {
         const offset = (dist: number) =>
                 dist > 0
                         ? 0.5 * dist

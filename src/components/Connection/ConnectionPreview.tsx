@@ -1,22 +1,16 @@
 import { Component, createMemo, onCleanup, onMount } from "solid-js";
 import { createPath } from "../../utils/path";
-import { Kit, Position } from "../../types";
+import { Kit, Position, xy } from "../../types";
 
 const sides = ["top", "bottom", "left", "right"] as Position[];
 const ConnectionPreview: Component<{ kit: Kit }> = (props) => {
-        const start = props.kit.activeConnectionDestination() as {
-                x: number;
-                y: number;
-        };
+        const start = props.kit.activeConnectionDestination() as xy;
         const startPos = props.kit.activeConnection.from!.side;
         const path = createMemo(() => {
                 return createPath({
                         start: start,
                         startPos,
-                        end: props.kit.activeConnectionDestination() as {
-                                x: number;
-                                y: number;
-                        },
+                        end: props.kit.activeConnectionDestination() as xy,
                         endPos:
                                 props.kit.activeConnection.to?.side ??
                                 sides[sides.indexOf(startPos) ^ 1] ??

@@ -1,24 +1,20 @@
 import { JSX } from "solid-js";
 import { Kit } from "./kit";
-
-export interface NodePosition {
-    x: number;
-    y: number;
-}
+import { xy } from "./viewport";
 
 export interface NodeData<T = any> {
-    label?: string;
-    component?: {
-        type: string;
-        props?: T & { kit?: Kit; node?: NodeType };
-    };
+        label?: string;
+        component?: {
+                type: string;
+                props?: T & { kit?: Kit; node?: NodeType };
+        };
 }
 
-export interface NodeType<Data = any> extends NodePosition {
-    id: string;
-    data?: NodeData<Data>;
-    width: number;
-    height: number;
-    class?: string;
-    style?: JSX.CSSProperties;
+export interface NodeType<Data = any> extends xy {
+        id: string;
+        data?: NodeData<Data>;
+        width: number;
+        height: number;
+        class?: string;
+        style?: JSX.CSSProperties;
 }

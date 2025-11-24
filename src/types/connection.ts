@@ -1,6 +1,5 @@
 import { JSX } from "solid-js";
 import { Position } from "./position";
-// export type Position = "top" | "left" | "bottom" | "right";
 
 export interface ConnectionNode {
         id: string;
@@ -17,6 +16,6 @@ export interface ConnectionType {
 }
 
 export type ActiveConnectionType = Partial<{
-        from: { id: string; side: Position };
-        to: { id: string; side: Position };
+        from: ConnectionNode;
+        to: Partial<ConnectionNode>;
 }>;

@@ -1,8 +1,16 @@
-import { createEffect, createMemo, For, onCleanup, Show } from "solid-js";
+import {
+        createEffect,
+        createMemo,
+        For,
+        onCleanup,
+        onMount,
+        Show,
+} from "solid-js";
 import { Dynamic } from "solid-js/web";
-import type { ComponentsType, Kit, NodeType } from "../../types";
+import type { ComponentsType, Kit, NodeType, ViewPort, xy } from "../../types";
 import Edge, { EdgePosition } from "./Edge";
 import { createDragHandler, calculateDelta } from "../../utils/events";
+import { create } from "domain";
 
 interface NodeProps {
         node: NodeType;
@@ -11,7 +19,6 @@ interface NodeProps {
 }
 
 const Node = ({ node, components = {}, kit }: NodeProps) => {
-        const gridSize = createMemo(() => kit.gridSize());
         const type = createMemo(() => node.data?.component?.type);
         const hasComponent = createMemo<boolean>(() =>
                 node.data?.component?.type
@@ -41,17 +48,16 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
 
         const controller = new AbortController();
 
-        const dragHandler = createDragHandler<{
-                x: number;
-                y: number;
-                clientX: number;
-                clientY: number;
-                zoom: number;
-                gridSize: number;
-        }>({
+        const dragHandler = createDragHandler<
+                {
+                        clientX: number;
+                        clientY: number;
+                        gridSize: number;
+                } & ViewPort
+        >({
                 onStart: (e) => {
                         setSelected(true);
-                        if (kit.focus()) {
+                        if (kit.focus() || kit.disableNodeDrag) {
                                 e.stopPropagation();
                                 return;
                         }
@@ -62,7 +68,7 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                                 clientX: e.clientX,
                                 clientY: e.clientY,
                                 zoom: kit.viewport().zoom,
-                                gridSize: gridSize(),
+                                gridSize: kit.gridSize!,
                         };
                 },
                 onMove: (e, startData) => {

@@ -5,9 +5,15 @@ import {
         enableUserSelect,
         clientToCanvasCoords,
 } from "../../utils/events";
-import { ConnectionType, NodeType, Position, Kit } from "../../types";
-
-const sides: Position[] = ["left", "right", "top", "bottom"];
+import {
+        ConnectionType,
+        NodeType,
+        Position,
+        Kit,
+        PositionList,
+        xy,
+        ConnectionNode,
+} from "../../types";
 
 const AnchorPoint: Component<{
         side: Position;
@@ -15,7 +21,7 @@ const AnchorPoint: Component<{
         id: string;
 }> = (props) => {
         let anchorRef!: HTMLDivElement;
-        let pointerStartPos: { x: number; y: number } | null = null;
+        let pointerStartPos: xy | null = null;
         let dragging = false;
 
         const onPointerMove = (e: PointerEvent) => {
@@ -41,9 +47,10 @@ const AnchorPoint: Component<{
                 const kit = props.kit;
                 if (kit.activeConnection.from) {
                         let to = kit.activeConnection.to;
-                        if (!to) {
+                        // Making a new node if it's not connected to  any => to : id + side
+                        if (!to?.id && !kit.disableAnchorConnectionCreation) {
                                 const dest = kit.activeConnectionDestination();
-                                const gridSize = props.kit.gridSize();
+                                const gridSize = props.kit.gridSize!;
                                 if (dest) {
                                         const x = snapToGrid(
                                                 dest.x - 75,
@@ -62,10 +69,10 @@ const AnchorPoint: Component<{
                                                 y,
                                                 width:
                                                         widthUnits *
-                                                        kit.gridSize(),
+                                                        kit.gridSize!,
                                                 height:
                                                         heightUnits *
-                                                        kit.gridSize(),
+                                                        kit.gridSize!,
                                                 data: {
                                                         label: "Node",
                                                         component: {
@@ -76,22 +83,23 @@ const AnchorPoint: Component<{
                                                 id,
                                         };
                                         kit.setNodes([...kit.nodes, node]);
-                                        kit.updateNodes();
+                                        kit.updateNodes(true);
 
                                         const fromSide =
                                                 kit.activeConnection.from.side;
-                                        const toSide = sides[
-                                                sides.indexOf(fromSide) ^ 1
+                                        const toSide = PositionList[
+                                                PositionList.indexOf(fromSide) ^
+                                                        1
                                         ] as Position;
-                                        to = { id, side: toSide };
+                                        to = { id, side: to?.side ?? toSide };
                                 }
                         }
-
-                        if (to && kit.activeConnection.from.id !== to.id) {
+                        // making a connection
+                        if (to?.id && kit.activeConnection.from.id !== to.id) {
                                 const connection: ConnectionType = {
                                         id: kit.randomId("connection"),
                                         from: kit.activeConnection.from!,
-                                        to: to!,
+                                        to: to as ConnectionNode,
                                 };
                                 kit.setConnections([
                                         ...kit.connections,

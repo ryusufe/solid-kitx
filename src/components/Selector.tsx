@@ -1,12 +1,19 @@
-import { createSignal, Component, Show, onMount, onCleanup } from "solid-js";
-import { Kit } from "../types";
+import {
+        createSignal,
+        Component,
+        Show,
+        onMount,
+        onCleanup,
+        createEffect,
+} from "solid-js";
+import { Kit, xy } from "../types";
 import { createDragHandler, clientToCanvasCoords } from "../utils/events";
 
 interface props {
         kit: Kit;
 }
 
-const DragSelect: Component<props> = ({ kit }) => {
+export const Selector: Component<props> = ({ kit }) => {
         const [isDragging, setIsDragging] = createSignal(false);
         let startPos = { x: 0, y: 0 };
         const [currentPos, setCurrentPos] = createSignal({ x: 0, y: 0 });
@@ -21,6 +28,16 @@ const DragSelect: Component<props> = ({ kit }) => {
                         bottom: Math.max(a.y, b.y),
                         width: Math.abs(a.x - b.x),
                         height: Math.abs(a.y - b.y),
+                };
+        };
+        const rectOnScreen = () => {
+                const r = rect();
+                const vp = kit.viewport();
+                return {
+                        left: r.left * vp.zoom,
+                        top: r.top * vp.zoom,
+                        width: r.width * vp.zoom,
+                        height: r.height * vp.zoom,
                 };
         };
 
@@ -41,14 +58,10 @@ const DragSelect: Component<props> = ({ kit }) => {
                         const vp = kit.viewport();
 
                         const elRect = {
-                                left: (box.left - bounds.left - vp.x) / vp.zoom,
-                                top: (box.top - bounds.top - vp.y) / vp.zoom,
-                                right:
-                                        (box.right - bounds.left - vp.x) /
-                                        vp.zoom,
-                                bottom:
-                                        (box.bottom - bounds.top - vp.y) /
-                                        vp.zoom,
+                                left: (box.left - bounds.left) / vp.zoom,
+                                top: (box.top - bounds.top) / vp.zoom,
+                                right: (box.right - bounds.left) / vp.zoom,
+                                bottom: (box.bottom - bounds.top) / vp.zoom,
                         };
 
                         const intersects = !(
@@ -67,14 +80,14 @@ const DragSelect: Component<props> = ({ kit }) => {
                 kit.setSelectedItems(new Set(hits));
         }
 
-        const dragHandler = createDragHandler<{ x: number; y: number }>({
+        const dragHandler = createDragHandler<xy>({
                 onStart: (e) => {
-                        if (e.button !== 0) return;
+                        if (e.button !== 0 && !kit.focus()) return;
 
                         const coords = clientToCanvasCoords(
                                 e.clientX,
                                 e.clientY,
-                                kit.viewport(),
+                                { ...kit.viewport(), x: 0, y: 0 },
                                 kit.container!.getBoundingClientRect(),
                         );
 
@@ -89,7 +102,7 @@ const DragSelect: Component<props> = ({ kit }) => {
                         const coords = clientToCanvasCoords(
                                 e.clientX,
                                 e.clientY,
-                                kit.viewport(),
+                                { ...kit.viewport(), x: 0, y: 0 },
                                 kit.container!.getBoundingClientRect(),
                         );
 
@@ -105,29 +118,29 @@ const DragSelect: Component<props> = ({ kit }) => {
         });
 
         onMount(() => {
-                window.addEventListener(
+                kit.container?.addEventListener(
                         "pointerdown",
                         dragHandler.onPointerDown,
                 );
         });
 
         onCleanup(() => {
-                window.removeEventListener(
+                kit.container?.removeEventListener(
                         "pointerdown",
                         dragHandler.onPointerDown,
                 );
         });
 
         return (
-                <Show when={isDragging()}>
+                <Show when={isDragging() && kit.focus()}>
                         <div
                                 class="kit-selection-rect"
                                 style={{
                                         position: "absolute",
-                                        left: `${rect().left}px`,
-                                        top: `${rect().top}px`,
-                                        width: `${rect().width}px`,
-                                        height: `${rect().height}px`,
+                                        left: `${rectOnScreen().left}px`,
+                                        top: `${rectOnScreen().top}px`,
+                                        width: `${rectOnScreen().width}px`,
+                                        height: `${rectOnScreen().height}px`,
                                         border: "1px solid rgb(var(--selection-rgb, 0,120,215))",
                                         "background-color":
                                                 "rgba(var(--selection-rgb, 0,120,215), 0.3)",
@@ -136,5 +149,3 @@ const DragSelect: Component<props> = ({ kit }) => {
                 </Show>
         );
 };
-
-export default DragSelect;

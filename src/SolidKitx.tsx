@@ -1,32 +1,9 @@
-import { createMemo, For, JSX, onCleanup, onMount, Show } from "solid-js";
-import {
-        ComponentsType,
-        ConnectionType,
-        Kit,
-        NodeType,
-        ViewPort,
-} from "./types";
+import { createMemo, For, onCleanup, onMount, Show } from "solid-js";
+import { ConnectionType, NodeType, SolidKitProps, xy } from "./types";
 import Node from "./components/Node/Node";
 import { createKit } from "./core/createKit";
 import Connection from "./components/Connection/Connection";
 import ConnectionPreview from "./components/Connection/ConnectionPreview";
-import DragSelect from "./components/DragSelect";
-
-export interface SolidKitProps {
-        nodes: NodeType[];
-        connections: ConnectionType[];
-        viewport: ViewPort;
-        onViewportChange: (vp: ViewPort) => void;
-        onNodesChange: (nodes: NodeType[]) => void;
-        onConnectionsChange: (connections: ConnectionType[]) => void;
-        defaultNode?: Partial<NodeType>;
-        gridSize?: number;
-        width?: number;
-        height?: number;
-        class?: string;
-        children?: JSX.Element | ((kit: Kit) => JSX.Element);
-        components?: ComponentsType;
-}
 
 export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         const kit = createKit({ ...props, gridSize });
@@ -35,7 +12,7 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
 
         let startvp = { x: 0, y: 0, zoom: 1 };
 
-        const pointers = new Map<number, { x: number; y: number }>();
+        const pointers = new Map<number, xy>();
         // pinch
         let iniPinx = 0;
         const onPointerDown = (
@@ -147,9 +124,10 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
 
                 const prev = kit.viewport();
                 const oldZoom = prev.zoom;
+                const newZoom = oldZoom - e.deltaY * 0.001;
                 const zoom = Math.max(
-                        0.1,
-                        Math.min(5, oldZoom - e.deltaY * 0.001),
+                        props.maxZoom ?? 0.1,
+                        Math.min(props.minZoom ?? 5, newZoom),
                 );
 
                 const x = cursorX - ((cursorX - prev.x) / oldZoom) * zoom;
@@ -171,11 +149,9 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         let containerRef!: HTMLDivElement;
         const updateRect = () => {
                 if (containerRef) {
-                        // console.log("deb");
                         kit.container = containerRef;
                 }
         };
-
         const onKeyDown = (e: KeyboardEvent) => {
                 const selected = kit.selectedItems();
                 if (e.key === "Delete" && selected.size > 0) {
@@ -192,13 +168,29 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         );
                         kit.updateNodes();
                         kit.updateConnections();
+                        selected.clear();
+                        kit.setSelectedItems(selected);
+                } else if (selected.size === 0) {
+                        // if (
+                        //         (e.ctrlKey || e.metaKey) &&
+                        //         e.key === "z"
+                        // ) {
+                        //         kit.undo();
+                        // }
+                        // if (
+                        //         (e.ctrlKey || e.metaKey) &&
+                        //         (e.key === "y" ||
+                        //                 (e.shiftKey && e.key === "Z"))
+                        // ) {
+                        //         kit.redo();
+                        // }
                 }
         };
 
         onMount(() => {
-                window.addEventListener("scrollend", onScrollEnd);
+                !props.disableZoom &&
+                        window.addEventListener("scrollend", onScrollEnd);
                 updateRect();
-                window.addEventListener("keydown", onKeyDown);
         });
 
         onCleanup(() => {
@@ -206,7 +198,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                 window.removeEventListener("pointermove", onPointerMove);
                 window.removeEventListener("pointerup", onPointerUp);
                 window.removeEventListener("pointercancel", onPointerUp);
-                window.removeEventListener("keydown", onKeyDown);
         });
 
         return (
@@ -214,7 +205,15 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         ref={containerRef}
                         class="solid-kitx"
                         onpointerdown={onPointerDown}
-                        onwheel={onWheel}
+                        onwheel={props.disableZoom ? undefined : onWheel}
+                        onkeydown={
+                                props.disableKeyboardShortcuts
+                                        ? undefined
+                                        : onKeyDown
+                        }
+                        tabindex={0}
+                        autofocus
+                        style={{ outline: "none" }}
                 >
                         <div
                                 class="container"
@@ -225,9 +224,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                         }px) scale(${vp().zoom})`,
                                 }}
                         >
-                                <Show when={kit.focus()}>
-                                        <DragSelect kit={kit} />
-                                </Show>
                                 <For each={kit.connections}>
                                         {(connection) => (
                                                 <Connection

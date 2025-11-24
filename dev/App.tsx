@@ -1,5 +1,5 @@
 import { createSignal, type Component } from "solid-js";
-import { BackgroundGrid, Controls, Kit, SolidKitx } from "solid-kitx";
+import { BackgroundGrid, Controls, Kit, Selector, SolidKitx } from "solid-kitx";
 import { ConnectionType, NodeType, ViewPort } from "solid-kitx";
 import "./styles.css";
 import { render } from "solid-js/web";
@@ -68,12 +68,13 @@ const App: Component = () => {
                         >
                                 {(kit: Kit) => (
                                         <>
-                                                <TopRightQA />
-                                                <Controls kit={kit} />
                                                 <BackgroundGrid
                                                         kit={kit}
                                                         absoluteGrid={30}
                                                 />
+                                                <Selector kit={kit} />
+                                                <TopRightQA />
+                                                <Controls kit={kit} />
                                         </>
                                 )}
                         </SolidKitx>

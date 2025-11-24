@@ -2,39 +2,38 @@ import { Accessor, Setter } from "solid-js";
 import { SetStoreFunction } from "solid-js/store";
 import type { NodeType } from "./node";
 import { ConnectionType, ActiveConnectionType } from "./connection";
-import { Viewport } from "./viewport";
+import { Viewport, xy } from "./viewport";
+import { Configs } from "./configs";
 
-export interface Kit {
-    nodes: NodeType[];
-    setNodes: SetStoreFunction<NodeType[]>;
+export interface Kit extends Configs {
+        nodes: NodeType[];
+        setNodes: SetStoreFunction<NodeType[]>;
 
-    connections: ConnectionType[];
-    setConnections: SetStoreFunction<ConnectionType[]>;
+        connections: ConnectionType[];
+        setConnections: SetStoreFunction<ConnectionType[]>;
 
-    viewport: Accessor<Viewport>;
-    setViewport: Setter<Viewport>;
+        viewport: Accessor<Viewport>;
+        setViewport: Setter<Viewport>;
 
-    focus: Accessor<boolean>;
-    setFocus: Setter<boolean>;
+        focus: Accessor<boolean>;
+        setFocus: Setter<boolean>;
 
-    selectedItems: () => Set<string>;
-    setSelectedItems: Setter<Set<string>>;
+        selectedItems: () => Set<string>;
+        setSelectedItems: Setter<Set<string>>;
 
-    activeConnectionDestination: () => { x: number; y: number } | null;
-    setActiveConnectionDestination: Setter<{ x: number; y: number } | null>;
+        activeConnectionDestination: () => xy | null;
+        setActiveConnectionDestination: Setter<xy | null>;
 
-    activeConnection: ActiveConnectionType;
+        activeConnection: ActiveConnectionType;
 
-    container: HTMLDivElement | null;
+        container: HTMLDivElement | null;
 
-    gridSize: Accessor<number>;
-    setGridSize: Setter<number>;
+        updateNodes: (skipHistory?: boolean) => void;
+        updateConnections: (skipHistory?: boolean) => void;
+        updateViewport: () => void;
 
-    defaultNode?: Partial<NodeType>;
+        undo?: () => void;
+        redo?: () => void;
 
-    updateNodes: () => void;
-    updateConnections: () => void;
-    updateViewport: () => void;
-
-    randomId: (type: "node" | "connection") => string;
+        randomId: (type: "node" | "connection") => string;
 }

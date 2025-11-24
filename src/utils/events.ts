@@ -1,3 +1,5 @@
+import { ViewPort, xy } from "src/types";
+
 export const snapToGrid = (value: number, gridSize: number): number => {
         return Math.round(value / gridSize) * gridSize;
 };
@@ -5,9 +7,9 @@ export const snapToGrid = (value: number, gridSize: number): number => {
 export const clientToCanvasCoords = (
         clientX: number,
         clientY: number,
-        viewport: { x: number; y: number; zoom: number },
+        viewport: ViewPort,
         containerRect: DOMRect | null,
-): { x: number; y: number } | null => {
+): xy | null => {
         if (!containerRect) return null;
 
         return {
