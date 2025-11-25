@@ -4,10 +4,8 @@ import { xy } from "./viewport";
 
 export interface NodeData<T = any> {
         label?: string;
-        component?: {
-                type: string;
-                props?: T & { kit?: Kit; node?: NodeType };
-        };
+        component?: string;
+        extra?: Record<string, T>;
 }
 
 export interface NodeType<Data = any> extends xy {

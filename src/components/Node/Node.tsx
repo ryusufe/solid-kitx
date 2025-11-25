@@ -11,11 +11,11 @@ interface NodeProps {
 }
 
 const Node = ({ node, components = {}, kit }: NodeProps) => {
-        const type = createMemo(() => node.data?.component?.type);
+        const type = createMemo(() => node.data?.component);
         const hasComponent = createMemo<boolean>(
                 () =>
-                        !!node.data?.component?.type &&
-                        node.data.component.type in components,
+                        !!node.data?.component &&
+                        node.data.component in components,
         );
         //
         const Toolbar = createMemo(() => "node-toolbar" in components);
@@ -241,7 +241,6 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                                 >
                                         <Dynamic
                                                 component={components![type()!]}
-                                                {...node.data?.component?.props}
                                                 node={node}
                                                 kit={kit}
                                         />

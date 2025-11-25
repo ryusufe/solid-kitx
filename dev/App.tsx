@@ -8,7 +8,6 @@ import ConnectionToolbar from "./components/ConnectionToolbar";
 import TopRightQA from "./components/TopRightQA";
 import ExampleMarkdown from "./components/ExampleMarkdown";
 import ExampleStatus from "./components/ExampleStatus";
-import { Part, unwrap } from "solid-js/store";
 //import "solid-kitx/index.css";
 
 interface DataType {
@@ -97,7 +96,7 @@ const data: DataType = {
                         height: 300,
                         data: {
                                 label: "Color Changer",
-                                component: { type: "example-status" },
+                                component: "example-status",
                         },
                         style: { "outline-color": "#272727" },
                 },
@@ -117,7 +116,7 @@ const data: DataType = {
                         height: 720,
                         data: {
                                 label: "Example markdown",
-                                component: { type: "example-markdown" },
+                                component: "example-markdown",
                         },
                 },
         ],
