@@ -14,6 +14,7 @@ import {
         xy,
         ConnectionNode,
 } from "../../types";
+import { reconcile } from "solid-js/store";
 
 const AnchorPoint: Component<{
         side: Position;
@@ -82,7 +83,9 @@ const AnchorPoint: Component<{
                                                 ...kit.defaultNode,
                                                 id,
                                         };
-                                        kit.setNodes([...kit.nodes, node]);
+                                        kit.setNodes(
+                                                reconcile([...kit.nodes, node]),
+                                        );
                                         kit.updateNodes(true);
 
                                         const fromSide =
@@ -101,10 +104,12 @@ const AnchorPoint: Component<{
                                         from: kit.activeConnection.from!,
                                         to: to as ConnectionNode,
                                 };
-                                kit.setConnections([
-                                        ...kit.connections,
-                                        connection,
-                                ]);
+                                kit.setConnections(
+                                        reconcile([
+                                                ...kit.connections,
+                                                connection,
+                                        ]),
+                                );
                                 kit.updateConnections();
                         }
                 }

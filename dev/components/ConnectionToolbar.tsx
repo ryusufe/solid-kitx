@@ -1,3 +1,4 @@
+import { reconcile } from "solid-js/store";
 import { ConnectionType, Kit, NodeType } from "solid-kitx";
 
 const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
@@ -7,17 +8,19 @@ const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
                 input.click();
                 input.addEventListener("input", () => {
                         console.log(input.value);
-                        props.kit.setConnections((prev: ConnectionType[]) =>
-                                prev.map((c) =>
-                                        c.id === props.connection.id
-                                                ? {
-                                                          ...c,
-                                                          style: {
-                                                                  ...c.style,
-                                                                  stroke: input.value,
-                                                          },
-                                                  }
-                                                : c,
+                        props.kit.setConnections(
+                                reconcile(
+                                        props.kit.connections.map((c) =>
+                                                c.id === props.connection.id
+                                                        ? {
+                                                                  ...c,
+                                                                  style: {
+                                                                          ...c.style,
+                                                                          stroke: input.value,
+                                                                  },
+                                                          }
+                                                        : c,
+                                        ),
                                 ),
                         );
                         props.kit.updateConnections();
@@ -25,8 +28,12 @@ const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
         };
 
         const removeConnection = () => {
-                props.kit.setConnections((prev: ConnectionType[]) =>
-                        prev.filter((n) => n.id !== props.connection.id),
+                props.kit.setConnections(
+                        reconcile(
+                                props.kit.connections.filter(
+                                        (n) => n.id !== props.connection.id,
+                                ),
+                        ),
                 );
                 props.kit.updateConnections();
         };

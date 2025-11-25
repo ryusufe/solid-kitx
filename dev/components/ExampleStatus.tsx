@@ -1,4 +1,5 @@
 import { Component, createMemo, createSignal, For } from "solid-js";
+import { reconcile } from "solid-js/store";
 import { Kit, NodeType } from "solid-kitx";
 const colors = [
         "#fee440",
@@ -50,17 +51,19 @@ const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
         });
         const onSelect = (c: string) => {
                 if (selected() === "Select") return;
-                props.kit.setNodes((prev: NodeType[]) =>
-                        prev.map((n) =>
-                                n.id === selected()
-                                        ? {
-                                                  ...n,
-                                                  style: {
-                                                          ...n.style,
-                                                          [property]: c,
-                                                  },
-                                          }
-                                        : n,
+                props.kit.setNodes(
+                        reconcile(
+                                props.kit.nodes.map((n) =>
+                                        n.id === selected()
+                                                ? {
+                                                          ...n,
+                                                          style: {
+                                                                  ...n.style,
+                                                                  [property]: c,
+                                                          },
+                                                  }
+                                                : n,
+                                ),
                         ),
                 );
         };

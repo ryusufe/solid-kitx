@@ -1,19 +1,17 @@
-import { createEffect, createSignal, on } from "solid-js";
+import { createSignal } from "solid-js";
 import { createStore, unwrap } from "solid-js/store";
 import {
         type Kit,
         type SolidKitProps,
         type ActiveConnectionType,
         xy,
-        NodeType,
-        ConnectionType,
 } from "../types";
 import { configKeys, Configs } from "../types/configs";
 
-interface History {
-        nodes: NodeType[];
-        connections: ConnectionType[];
-}
+// interface History {
+//         nodes: NodeType[];
+//         connections: ConnectionType[];
+// }
 
 export const createKit = (props: SolidKitProps): Kit => {
         const [nodes, setNodes] = createStore(props.nodes || []);
@@ -23,6 +21,7 @@ export const createKit = (props: SolidKitProps): Kit => {
         const [viewport, setViewport] = createSignal(
                 props.viewport || { x: 0, y: 0, zoom: 1 },
         );
+
         const [focus, setFocus] = createSignal(false);
         const [selectedItems, setSelectedItems] = createSignal(
                 new Set<string>(),

@@ -1,12 +1,17 @@
-import { createMemo, For, onCleanup, onMount, Show } from "solid-js";
+import { children, createMemo, For, onCleanup, onMount, Show } from "solid-js";
 import { ConnectionType, NodeType, SolidKitProps, xy } from "./types";
 import Node from "./components/Node/Node";
 import { createKit } from "./core/createKit";
 import Connection from "./components/Connection/Connection";
 import ConnectionPreview from "./components/Connection/ConnectionPreview";
+import { reconcile } from "solid-js/store";
 
 export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         const kit = createKit({ ...props, gridSize });
+        const Children = () => {
+                const c = props.children;
+                return typeof c === "function" ? c(kit) : c;
+        };
 
         const vp = createMemo(() => kit.viewport());
 
@@ -155,16 +160,24 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
         const onKeyDown = (e: KeyboardEvent) => {
                 const selected = kit.selectedItems();
                 if (e.key === "Delete" && selected.size > 0) {
-                        kit.setConnections((prev: ConnectionType[]) =>
-                                prev.filter(
-                                        (c) =>
-                                                !selected.has(c.id) &&
-                                                !selected.has(c.from.id) &&
-                                                !selected.has(c.to.id),
+                        kit.setConnections(
+                                reconcile(
+                                        kit.connections.filter(
+                                                (c) =>
+                                                        !selected.has(c.id) &&
+                                                        !selected.has(
+                                                                c.from.id,
+                                                        ) &&
+                                                        !selected.has(c.to.id),
+                                        ),
                                 ),
                         );
-                        kit.setNodes((prev: NodeType[]) =>
-                                prev.filter((n) => !selected.has(n.id)),
+                        kit.setNodes(
+                                reconcile(
+                                        kit.nodes.filter(
+                                                (n) => !selected.has(n.id),
+                                        ),
+                                ),
                         );
                         kit.updateNodes();
                         kit.updateConnections();
@@ -255,9 +268,7 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                                         )}
                                 </For>
                         </div>
-                        {typeof props.children === "function"
-                                ? props.children(kit)
-                                : props.children}
+                        <Children />
                 </div>
         );
 };

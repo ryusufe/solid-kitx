@@ -1,16 +1,8 @@
-import {
-        createEffect,
-        createMemo,
-        For,
-        onCleanup,
-        onMount,
-        Show,
-} from "solid-js";
+import { createEffect, createMemo, For, onCleanup, Show } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import type { ComponentsType, Kit, NodeType, ViewPort, xy } from "../../types";
 import Edge, { EdgePosition } from "./Edge";
 import { createDragHandler, calculateDelta } from "../../utils/events";
-import { create } from "domain";
 
 interface NodeProps {
         node: NodeType;
@@ -20,13 +12,13 @@ interface NodeProps {
 
 const Node = ({ node, components = {}, kit }: NodeProps) => {
         const type = createMemo(() => node.data?.component?.type);
-        const hasComponent = createMemo<boolean>(() =>
-                node.data?.component?.type
-                        ? !!components![node.data.component.type]
-                        : false,
+        const hasComponent = createMemo<boolean>(
+                () =>
+                        !!node.data?.component?.type &&
+                        node.data.component.type in components,
         );
         //
-        const Toolbar = createMemo(() => !!components?.["node-toolbar"]);
+        const Toolbar = createMemo(() => "node-toolbar" in components);
         //
         const selected = createMemo(() => {
                 if (!kit) return false;

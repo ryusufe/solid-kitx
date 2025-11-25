@@ -8,7 +8,7 @@ import ConnectionToolbar from "./components/ConnectionToolbar";
 import TopRightQA from "./components/TopRightQA";
 import ExampleMarkdown from "./components/ExampleMarkdown";
 import ExampleStatus from "./components/ExampleStatus";
-import { Part } from "solid-js/store";
+import { Part, unwrap } from "solid-js/store";
 //import "solid-kitx/index.css";
 
 interface DataType {
@@ -81,6 +81,7 @@ const App: Component = () => {
                 </div>
         );
 };
+
 const defaultNode: Partial<NodeType> = {
         width: 150,
         height: 60,

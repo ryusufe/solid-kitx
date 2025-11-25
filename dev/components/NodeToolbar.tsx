@@ -1,3 +1,4 @@
+import { reconcile } from "solid-js/store";
 import { ConnectionType, Kit, NodeType } from "solid-kitx";
 
 const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
@@ -9,18 +10,20 @@ const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
                         // certain css properties depend on the state (hover, active, ...) of the node, and the example below overrides
                         // all of those so it will be a static color, a better solution would be assiging that value to a custom css variable
                         // then apply it inside a css file under the class of that node (.node or (node as NodeType).class)
-                        props.kit.setNodes((prev: NodeType[]) =>
-                                prev.map((n) =>
-                                        n.id === props.node.id
-                                                ? {
-                                                          ...n,
-                                                          style: {
-                                                                  ...n.style,
-                                                                  "outline-color":
-                                                                          input.value,
-                                                          },
-                                                  }
-                                                : n,
+                        props.kit.setNodes(
+                                reconcile(
+                                        props.kit.nodes.map((n) =>
+                                                n.id === props.node.id
+                                                        ? {
+                                                                  ...n,
+                                                                  style: {
+                                                                          ...n.style,
+                                                                          "outline-color":
+                                                                                  input.value,
+                                                                  },
+                                                          }
+                                                        : n,
+                                        ),
                                 ),
                         );
                         props.kit.updateNodes();
@@ -29,13 +32,17 @@ const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
 
         const removeNode = () => {
                 const n_id = props.node.id;
-                props.kit.setConnections((prev: ConnectionType[]) =>
-                        prev.filter(
-                                (c) => c.from.id !== n_id && c.to.id !== n_id,
+                props.kit.setConnections(
+                        reconcile(
+                                props.kit.connections.filter(
+                                        (c) =>
+                                                c.from.id !== n_id &&
+                                                c.to.id !== n_id,
+                                ),
                         ),
                 );
-                props.kit.setNodes((prev: NodeType[]) =>
-                        prev.filter((n) => n.id !== n_id),
+                props.kit.setNodes(
+                        reconcile(props.kit.nodes.filter((n) => n.id !== n_id)),
                 );
                 props.kit.updateNodes();
         };

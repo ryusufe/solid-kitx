@@ -4,7 +4,6 @@ export const configKeys = [
         "disableZoom",
         "minZoom",
         "maxZoom",
-        "zoomStep",
         "disableNodeDrag",
         "disableEdgeDrag",
         "gridSize",
