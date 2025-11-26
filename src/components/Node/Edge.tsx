@@ -255,7 +255,7 @@ const Edge: Component<{
                         <Show
                                 when={
                                         !isCorner &&
-                                        props.kit.configs.disableNodeAnchors
+                                        !props.kit.configs.disableNodeAnchors
                                 }
                         >
                                 <AnchorPoint

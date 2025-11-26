@@ -18,7 +18,7 @@ npm install solid-kitx
 
 
 ```tsx
-import { createSignal, Component } from "solid-js";
+import { createStore, Component } from "solid-js";
 import { SolidKitx, ConnectionType, NodeType, ViewPort } from "solid-kitx";
 import "solid-kitx/index.css";
 
