@@ -44,7 +44,6 @@ export const Selector: Component<props> = ({ kit }) => {
         function detectSelection() {
                 const r = rect();
                 if (r.width < 5 || r.height < 5) return;
-                console.log("d");
                 const bounds = kit.container!.getBoundingClientRect();
                 const hits: string[] = [];
 

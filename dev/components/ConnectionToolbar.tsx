@@ -7,7 +7,6 @@ const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
                 input.type = "color";
                 input.click();
                 input.addEventListener("input", () => {
-                        console.log(input.value);
                         props.kit.setConnections(
                                 reconcile(
                                         props.kit.connections.map((c) =>

@@ -76,7 +76,7 @@ const TopRightQA = () => {
                                                 </svg>
                                         </Show>
                                 </div>
-                                <button onclick={toggleTheme}>
+                                <button onpointerdown={toggleTheme}>
                                         <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 width="24"

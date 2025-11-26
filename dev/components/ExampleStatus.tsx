@@ -54,7 +54,8 @@ const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
                 props.kit.setNodes(
                         reconcile(
                                 props.kit.nodes.map((n) =>
-                                        n.id === selected()
+                                        n.id ===
+                                        selected()?.split("-container")[0]
                                                 ? {
                                                           ...n,
                                                           style: {
@@ -120,12 +121,9 @@ const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
                                 <For each={colors}>
                                         {(c) => (
                                                 <div
-                                                        onclick={() =>
-                                                                onSelect(c)
-                                                        }
-                                                        ontouchstart={() =>
-                                                                onSelect(c)
-                                                        }
+                                                        onpointerdown={() => {
+                                                                onSelect(c);
+                                                        }}
                                                         style={{
                                                                 "background-color":
                                                                         c,

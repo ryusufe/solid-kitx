@@ -48,11 +48,6 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                 } & ViewPort
         >({
                 onStart: (e) => {
-                        if (kit.focus()) {
-                                e.stopPropagation();
-                                return;
-                        }
-
                         return {
                                 x: node.x,
                                 y: node.y,
@@ -99,7 +94,12 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                 e: PointerEvent & { currentTarget: HTMLDivElement },
         ) => {
                 setSelected(true);
-                if (e.button === 2 || kit.configs.disableNodeDrag) return;
+                if (
+                        e.button === 2 ||
+                        kit.configs.disableNodeDrag ||
+                        kit.focus()
+                )
+                        return;
                 dragHandler.onPointerDown(e);
         };
 
@@ -161,7 +161,7 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                         ref={nodeDiv}
                         class={`node ${node.class ?? ""} `}
                         classList={{ selected: selected() }}
-                        id={node.id + "-container"}
+                        id={node.id}
                         onpointerdown={onPointerDown}
                         style={{
                                 transform: `translate(${node.x}px, ${node.y}px)`,
@@ -230,13 +230,6 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                                                         value,
                                                 );
                                                 kit.updateNodes();
-                                                console.log(
-                                                        kit.nodes.find(
-                                                                (i) =>
-                                                                        i.id ===
-                                                                        node.id,
-                                                        )?.data?.label,
-                                                );
                                         }}
                                         onKeyDown={(e) => {
                                                 if (e.key === "Escape")
