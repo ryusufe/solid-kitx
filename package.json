@@ -1,6 +1,6 @@
 {
         "name": "solid-kitx",
-        "version": "0.1.6",
+        "version": "0.1.7",
         "description": "Minimal SolidJS flow library",
         "license": "MIT",
         "author": "ryusufe",
@@ -37,7 +37,8 @@
                 "prepublishOnly": "npm run build",
                 "build-demo": "vite build dev",
                 "predeploy-demo": "npm run build-demo",
-                "deploy-demo": "gh-pages -d dev/dist"
+                "deploy-demo": "gh-pages -d dev/dist",
+                "pack-install": "npm run build && PKG=$(npm pack --silent) && cd ~/hub/hollow && npm install \"../solid-kit/$PKG\""
         },
         "peerDependencies": {
                 "solid-js": "^1.6.0"

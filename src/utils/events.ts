@@ -1,3 +1,4 @@
+import { createEffect } from "solid-js";
 import { ViewPort, xy } from "src/types";
 
 export const snapToGrid = (value: number, gridSize: number): number => {
@@ -131,3 +132,24 @@ export const createDragHandler = <T>(config: DragHandlerConfig<T>) => {
                 onPointerDown,
         };
 };
+
+export function onConfigListener<
+        T extends EventTarget,
+        K extends keyof GlobalEventHandlersEventMap,
+>(
+        target: () => T | undefined,
+        enabled: () => boolean,
+        event: K,
+        handler: (e: GlobalEventHandlersEventMap[K]) => void,
+) {
+        createEffect(() => {
+                const el = target();
+                if (!el) return;
+
+                if (enabled()) {
+                        el.addEventListener(event, handler as EventListener);
+                } else {
+                        el.removeEventListener(event, handler as EventListener);
+                }
+        });
+}

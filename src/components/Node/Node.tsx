@@ -48,8 +48,7 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                 } & ViewPort
         >({
                 onStart: (e) => {
-                        setSelected(true);
-                        if (kit.focus() || kit.disableNodeDrag) {
+                        if (kit.focus()) {
                                 e.stopPropagation();
                                 return;
                         }
@@ -60,7 +59,7 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                                 clientX: e.clientX,
                                 clientY: e.clientY,
                                 zoom: kit.viewport().zoom,
-                                gridSize: kit.gridSize!,
+                                gridSize: kit.configs.gridSize!,
                         };
                 },
                 onMove: (e, startData) => {
@@ -99,6 +98,8 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
         const onPointerDown = (
                 e: PointerEvent & { currentTarget: HTMLDivElement },
         ) => {
+                setSelected(true);
+                if (e.button === 2 || kit.configs.disableNodeDrag) return;
                 dragHandler.onPointerDown(e);
         };
 
@@ -145,7 +146,7 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                         ref={nodeDiv}
                         class={`node ${node.class ?? ""} `}
                         classList={{ selected: selected() }}
-                        id={node.id}
+                        id={node.id + "-container"}
                         onpointerdown={onPointerDown}
                         style={{
                                 transform: `translate(${node.x}px, ${node.y}px)`,

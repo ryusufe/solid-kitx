@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createEffect, createSignal, splitProps } from "solid-js";
 import { createStore, unwrap } from "solid-js/store";
 import {
         type Kit,
@@ -6,7 +6,7 @@ import {
         type ActiveConnectionType,
         xy,
 } from "../types";
-import { configKeys, Configs } from "../types/configs";
+import { configKeys, ConfigsType } from "../types/configs";
 
 // interface History {
 //         nodes: NodeType[];
@@ -14,10 +14,8 @@ import { configKeys, Configs } from "../types/configs";
 // }
 
 export const createKit = (props: SolidKitProps): Kit => {
-        const [nodes, setNodes] = createStore(props.nodes || []);
-        const [connections, setConnections] = createStore(
-                props.connections || [],
-        );
+        const [nodes, setNodes] = props.nodesStore;
+        const [connections, setConnections] = props.connectionsStore;
         const [viewport, setViewport] = createSignal(
                 props.viewport || { x: 0, y: 0, zoom: 1 },
         );
@@ -119,9 +117,7 @@ export const createKit = (props: SolidKitProps): Kit => {
         //         updateConnections(true);
         // };
         //
-        const configs: Configs = Object.fromEntries(
-                configKeys.map((k) => [k, props[k]]),
-        );
+        const [configs] = splitProps(props, configKeys);
 
         return {
                 nodes,
@@ -144,6 +140,6 @@ export const createKit = (props: SolidKitProps): Kit => {
                 randomId,
                 // redo,
                 // undo,
-                ...configs,
+                configs,
         };
 };

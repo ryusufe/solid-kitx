@@ -4,11 +4,15 @@ import type { ConnectionType } from "./connection";
 import type { ViewPort } from "./viewport";
 import type { Kit } from "./kit";
 import type { ComponentsType } from "./components";
-import { Configs } from "./configs";
+import { ConfigsType } from "./configs";
+import { SetStoreFunction } from "solid-js/store";
 
-export interface SolidKitProps extends Configs {
-        nodes: NodeType[];
-        connections: ConnectionType[];
+export interface SolidKitProps extends ConfigsType {
+        nodesStore: [get: NodeType[], set: SetStoreFunction<NodeType[]>];
+        connectionsStore: [
+                get: ConnectionType[],
+                set: SetStoreFunction<ConnectionType[]>,
+        ];
         viewport: ViewPort;
         onViewportChange: (vp: ViewPort) => void;
         onNodesChange: (nodes: NodeType[]) => void;

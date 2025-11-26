@@ -6,7 +6,7 @@ export const BackgroundGrid: Component<{
         absoluteGrid?: number;
 }> = (props) => {
         const grid = createMemo(
-                () => props.absoluteGrid ?? props.kit.gridSize ?? 30,
+                () => props.absoluteGrid ?? props.kit.configs.gridSize ?? 30,
         );
         const vp = createMemo(() => props.kit.viewport());
         const dif = createMemo(() => grid() * vp().zoom);

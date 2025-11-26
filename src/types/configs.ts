@@ -12,13 +12,14 @@ export const configKeys = [
         "minNodeHeight",
         "maxNodeHeight",
         "defaultNode",
+        "disableNodeAnchors",
         "disableAnchorConnectionCreation",
         "disableKeyboardShortcuts",
         // "enableHistory",
         // "historyLimit",
 ] as const;
 
-export interface Configs {
+export interface ConfigsType {
         // Viewport / Interaction
         disableZoom?: boolean;
         minZoom?: number;
@@ -38,6 +39,7 @@ export interface Configs {
 
         // Node Creation
         defaultNode?: Partial<NodeType>;
+        disableNodeAnchors?: boolean;
 
         // Connection Creation
         disableAnchorConnectionCreation?: boolean;

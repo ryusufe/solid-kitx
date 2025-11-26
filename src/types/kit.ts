@@ -3,9 +3,9 @@ import { SetStoreFunction } from "solid-js/store";
 import type { NodeType } from "./node";
 import { ConnectionType, ActiveConnectionType } from "./connection";
 import { Viewport, xy } from "./viewport";
-import { Configs } from "./configs";
+import { ConfigsType } from "./configs";
 
-export interface Kit extends Configs {
+export interface Kit {
         nodes: NodeType[];
         setNodes: SetStoreFunction<NodeType[]>;
 
@@ -32,6 +32,7 @@ export interface Kit extends Configs {
         updateConnections: (skipHistory?: boolean) => void;
         updateViewport: () => void;
 
+        configs: ConfigsType;
         undo?: () => void;
         redo?: () => void;
 

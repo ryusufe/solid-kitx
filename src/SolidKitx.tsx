@@ -1,13 +1,23 @@
-import { children, createMemo, For, onCleanup, onMount, Show } from "solid-js";
+import {
+        children,
+        createEffect,
+        createMemo,
+        For,
+        on,
+        onCleanup,
+        onMount,
+        Show,
+} from "solid-js";
 import { ConnectionType, NodeType, SolidKitProps, xy } from "./types";
 import Node from "./components/Node/Node";
 import { createKit } from "./core/createKit";
 import Connection from "./components/Connection/Connection";
 import ConnectionPreview from "./components/Connection/ConnectionPreview";
 import { reconcile } from "solid-js/store";
+import { onConfigListener } from "./utils/events";
 
-export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
-        const kit = createKit({ ...props, gridSize });
+export const SolidKitx = (props: SolidKitProps) => {
+        const kit = createKit(props);
         const Children = () => {
                 const c = props.children;
                 return typeof c === "function" ? c(kit) : c;
@@ -119,11 +129,13 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                 }
         };
 
-        const onWheel = (e: WheelEvent & { currentTarget: HTMLDivElement }) => {
+        const onWheel = (e: WheelEvent) => {
                 if (kit.focus()) return;
                 e.preventDefault();
 
-                const rect = e.currentTarget.getBoundingClientRect();
+                const rect = (
+                        e.target as HTMLDivElement
+                ).getBoundingClientRect();
                 const cursorX = e.clientX - rect.left;
                 const cursorY = e.clientY - rect.top;
 
@@ -183,26 +195,27 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         kit.updateConnections();
                         selected.clear();
                         kit.setSelectedItems(selected);
-                } else if (selected.size === 0) {
-                        // if (
-                        //         (e.ctrlKey || e.metaKey) &&
-                        //         e.key === "z"
-                        // ) {
-                        //         kit.undo();
-                        // }
-                        // if (
-                        //         (e.ctrlKey || e.metaKey) &&
-                        //         (e.key === "y" ||
-                        //                 (e.shiftKey && e.key === "Z"))
-                        // ) {
-                        //         kit.redo();
-                        // }
                 }
         };
-
+        onConfigListener(
+                () => containerRef,
+                () => !props.disableZoom,
+                "wheel",
+                onWheel,
+        );
+        onConfigListener(
+                () => window,
+                () => !props.disableZoom,
+                "scrollend",
+                onScrollEnd,
+        );
+        onConfigListener(
+                () => containerRef,
+                () => !props.disableKeyboardShortcuts,
+                "keydown",
+                onKeyDown,
+        );
         onMount(() => {
-                !props.disableZoom &&
-                        window.addEventListener("scrollend", onScrollEnd);
                 updateRect();
         });
 
@@ -218,12 +231,6 @@ export const SolidKitx = ({ gridSize = 30, ...props }: SolidKitProps) => {
                         ref={containerRef}
                         class="solid-kitx"
                         onpointerdown={onPointerDown}
-                        onwheel={props.disableZoom ? undefined : onWheel}
-                        onkeydown={
-                                props.disableKeyboardShortcuts
-                                        ? undefined
-                                        : onKeyDown
-                        }
                         tabindex={0}
                         autofocus
                         style={{ outline: "none" }}

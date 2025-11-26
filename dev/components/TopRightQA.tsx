@@ -1,4 +1,4 @@
-import { Component, createSignal, For, Show } from "solid-js";
+import { Component, createSignal, For, Setter, Show } from "solid-js";
 
 const instructions = [
         {
@@ -15,7 +15,7 @@ const instructions = [
         },
 ];
 
-const TopRightQA: Component = () => {
+const TopRightQA = () => {
         let isPhone = window.matchMedia("(max-width: 600px)").matches;
         const [isOpen, setIsOpen] = createSignal(!isPhone);
         const [openIndexes, setOpenIndexes] = createSignal(new Set());
@@ -35,7 +35,9 @@ const TopRightQA: Component = () => {
                 <div
                         class="instructions-popup"
                         classList={{ open: isOpen() }}
-                        onMouseDown={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => {
+                                e.stopPropagation();
+                        }}
                 >
                         <div
                                 style={{

@@ -12,20 +12,20 @@ const Edge: Component<{
 }> = (props) => {
         const isCorner = ["tl", "tr", "bl", "br"].includes(props.side);
 
-        const {
-                minNodeWidth = 1,
-                maxNodeWidth = 10000,
-                minNodeHeight = 1,
-                maxNodeHeight = 10000,
-        } = props.kit;
-
         const clamp = (value: number, min: number, max: number) =>
                 Math.max(min, Math.min(value, max));
 
-        const getRespectedWidth = (value: number) =>
-                clamp(value, minNodeWidth, maxNodeWidth);
-        const getRespectedHeight = (value: number) =>
-                clamp(value, minNodeHeight, maxNodeHeight);
+        const getRespectedWidth = (value: number) => {
+                const { minNodeWidth = 1, maxNodeWidth = 10000 } =
+                        props.kit.configs;
+                return clamp(value, minNodeWidth, maxNodeWidth);
+        };
+
+        const getRespectedHeight = (value: number) => {
+                const { minNodeHeight = 1, maxNodeHeight = 10000 } =
+                        props.kit.configs;
+                return clamp(value, minNodeHeight, maxNodeHeight);
+        };
 
         const positionStyle = (() => {
                 switch (props.side) {
@@ -101,7 +101,7 @@ const Edge: Component<{
                         ? {
                                   width: thickness,
                                   height: thickness,
-                                  cursor,
+                                  "--cursor": cursor,
                           }
                         : {
                                   width:
@@ -112,7 +112,7 @@ const Edge: Component<{
                                           single.axis === "y"
                                                   ? thickness
                                                   : "100%",
-                                  cursor,
+                                  "--cursor": cursor,
                           };
         });
 
@@ -135,7 +135,7 @@ const Edge: Component<{
                                 clientX: e.clientX,
                                 clientY: e.clientY,
                                 vp: props.kit.viewport(),
-                                gridSize: props.kit.gridSize!,
+                                gridSize: props.kit.configs.gridSize!,
                         };
                 },
                 onMove: (e, startNode) => {
@@ -215,6 +215,10 @@ const Edge: Component<{
                 preventDefault: true,
                 disableSelection: true,
         });
+        const onPointerDown = (e: PointerEvent) => {
+                if (props.kit.configs.disableEdgeDrag) return;
+                dragHandler.onPointerDown(e);
+        };
 
         const onPinterEnter = () => {
                 const { from } = props.kit.activeConnection;
@@ -246,13 +250,14 @@ const Edge: Component<{
                         }}
                         onpointerenter={onPinterEnter}
                         onpointerleave={onPointerLeave}
-                        onPointerDown={
-                                props.kit.disableEdgeDrag
-                                        ? undefined
-                                        : dragHandler.onPointerDown
-                        }
+                        onPointerDown={onPointerDown}
                 >
-                        <Show when={!isCorner}>
+                        <Show
+                                when={
+                                        !isCorner &&
+                                        props.kit.configs.disableNodeAnchors
+                                }
+                        >
                                 <AnchorPoint
                                         side={props.side as Position}
                                         kit={props.kit}

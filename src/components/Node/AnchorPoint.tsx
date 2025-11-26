@@ -49,9 +49,12 @@ const AnchorPoint: Component<{
                 if (kit.activeConnection.from) {
                         let to = kit.activeConnection.to;
                         // Making a new node if it's not connected to  any => to : id + side
-                        if (!to?.id && !kit.disableAnchorConnectionCreation) {
+                        if (
+                                !to?.id &&
+                                !kit.configs.disableAnchorConnectionCreation
+                        ) {
                                 const dest = kit.activeConnectionDestination();
-                                const gridSize = props.kit.gridSize!;
+                                const gridSize = props.kit.configs.gridSize!;
                                 if (dest) {
                                         const x = snapToGrid(
                                                 dest.x - 75,
@@ -70,17 +73,15 @@ const AnchorPoint: Component<{
                                                 y,
                                                 width:
                                                         widthUnits *
-                                                        kit.gridSize!,
+                                                        kit.configs.gridSize!,
                                                 height:
                                                         heightUnits *
-                                                        kit.gridSize!,
+                                                        kit.configs.gridSize!,
                                                 data: {
                                                         label: "Node",
-                                                        component: {
-                                                                type: "default",
-                                                        },
+                                                        component: "default",
                                                 },
-                                                ...kit.defaultNode,
+                                                ...kit.configs.defaultNode,
                                                 id,
                                         };
                                         kit.setNodes(

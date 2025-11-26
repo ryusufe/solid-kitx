@@ -10,4 +10,5 @@ export type {
         ViewPort,
         NodeToolbarProps,
         ConnectionToolbarProps,
+        ConfigsType,
 } from "./types";

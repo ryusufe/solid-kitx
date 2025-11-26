@@ -1,4 +1,4 @@
-import { createSignal, type Component } from "solid-js";
+import { createSignal, onMount, type Component } from "solid-js";
 import { BackgroundGrid, Controls, Kit, Selector, SolidKitx } from "solid-kitx";
 import { ConnectionType, NodeType, ViewPort } from "solid-kitx";
 import "./styles.css";
@@ -8,6 +8,8 @@ import ConnectionToolbar from "./components/ConnectionToolbar";
 import TopRightQA from "./components/TopRightQA";
 import ExampleMarkdown from "./components/ExampleMarkdown";
 import ExampleStatus from "./components/ExampleStatus";
+import { createStore } from "solid-js/store";
+import { createSign } from "node:crypto";
 //import "solid-kitx/index.css";
 
 interface DataType {
@@ -18,10 +20,10 @@ interface DataType {
 }
 
 const App: Component = () => {
-        const [nodes, setNodes] = createSignal<DataType["nodes"]>(data.nodes);
-        const [connections, setConnections] = createSignal<
-                DataType["connections"]
-        >(data.connections);
+        const nodesStore = createStore<NodeType[]>(data.nodes);
+        const connectionsStore = createStore<ConnectionType[]>(
+                data.connections,
+        );
         const [viewport, setViewport] = createSignal<DataType["viewport"]>(
                 data.viewport,
         );
@@ -50,9 +52,9 @@ const App: Component = () => {
                         }}
                 >
                         <SolidKitx
-                                nodes={nodes()}
+                                nodesStore={nodesStore}
                                 onNodesChange={onNodesChange}
-                                connections={connections()}
+                                connectionsStore={connectionsStore}
                                 onConnectionsChange={onConnectionsChange}
                                 viewport={viewport()}
                                 onViewportChange={onViewportChange}
