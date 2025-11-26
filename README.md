@@ -23,7 +23,7 @@ import { SolidKitx, ConnectionType, NodeType, ViewPort } from "solid-kitx";
 import "solid-kitx/index.css";
 
 const App: Component = () => {
-  const [nodes, setNodes] = createSignal<NodeType[]>([
+  const nodesStore = createStore<NodeType[]>([
     {
       id: "node-1",
       x: 100,
@@ -42,7 +42,7 @@ const App: Component = () => {
     },
   ]);
 
-  const [connections, setConnections] = createSignal<ConnectionType[]>([
+  const connectionsStore = createStore<ConnectionType[]>([
     {
       id: "connection-1",
       from: { id: "node-1", side: "right" },
@@ -50,13 +50,20 @@ const App: Component = () => {
     },
   ]);
 
+  const onNodesChange = () => {
+        // save in db
+  }
+  const onConnectionsChange = () => {
+        // save in db
+  }
+
   const [viewport, setViewport] = createSignal<ViewPort>({ x: 0, y: 0, zoom: 1 });
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
       <SolidKitx
-        nodes={nodes()}
-        connections={connections()}
+        nodesStore={nodesStore}
+        connectionsStore={connectionsStore}
         viewport={viewport()}
         onNodesChange={setNodes}
         onConnectionsChange={setConnections}
