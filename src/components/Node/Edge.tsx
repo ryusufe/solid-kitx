@@ -95,6 +95,7 @@ const Edge: Component<{
                 : single?.cursor ?? "default";
 
         const size = createMemo(() => {
+                if (props.kit.configs.disableEdgeDrag) return {};
                 const thickness = "calc(var(--node-border-width, 2px) + 10px)";
 
                 return isCorner

@@ -1,4 +1,4 @@
-import { createEffect, createMemo, For, onCleanup, Show } from "solid-js";
+import { createEffect, createMemo, For, on, onCleanup, Show } from "solid-js";
 import { Dynamic } from "solid-js/web";
 import type { ComponentsType, Kit, NodeType, ViewPort, xy } from "../../types";
 import Edge, { EdgePosition } from "./Edge";
@@ -103,21 +103,36 @@ const Node = ({ node, components = {}, kit }: NodeProps) => {
                 dragHandler.onPointerDown(e);
         };
 
-        createEffect(() => {
-                if (!nodeDiv) return;
-
-                if (selected()) {
-                        nodeDiv.focus();
-                        window.addEventListener("pointerdown", onClickOutside, {
-                                signal: controller.signal,
-                        });
-                        window.addEventListener("keydown", onKeyDown, {
-                                signal: controller.signal,
-                        });
-                } else if (nodeDiv.classList.contains("selected")) {
-                        nodeDiv.blur();
-                }
-        });
+        createEffect(
+                on(
+                        selected,
+                        () => {
+                                if (!nodeDiv) return;
+                                if (selected()) {
+                                        nodeDiv.focus();
+                                        window.addEventListener(
+                                                "pointerdown",
+                                                onClickOutside,
+                                                {
+                                                        signal: controller.signal,
+                                                },
+                                        );
+                                        window.addEventListener(
+                                                "keydown",
+                                                onKeyDown,
+                                                {
+                                                        signal: controller.signal,
+                                                },
+                                        );
+                                } else if (
+                                        nodeDiv.classList.contains("selected")
+                                ) {
+                                        nodeDiv.blur();
+                                }
+                        },
+                        { defer: true },
+                ),
+        );
 
         const onClickOutside = (e: MouseEvent) => {
                 const target = e.target as Node;

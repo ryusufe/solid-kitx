@@ -46,6 +46,7 @@
                                 display: flex;
                                 justify-content: center;
                                 align-items: center;
+                                cursor: var(--cursor);
 
                                 &:hover {
                                         .node-anchor {
@@ -57,7 +58,6 @@
 
                         .node-anchor {
                                 opacity: var(--opacity, 0);
-                                cursor: var(--cursor);
                                 background-color: var(--node-bg, #f2f2f2);
                                 border: 2px solid var(--node-anchor-border, #b0b0b0);
                                 width: 10px;

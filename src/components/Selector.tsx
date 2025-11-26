@@ -43,8 +43,9 @@ export const Selector: Component<props> = ({ kit }) => {
 
         function detectSelection() {
                 const r = rect();
+                if (r.width < 5 || r.height < 5) return;
+                console.log("d");
                 const bounds = kit.container!.getBoundingClientRect();
-
                 const hits: string[] = [];
 
                 const elements =
@@ -76,13 +77,12 @@ export const Selector: Component<props> = ({ kit }) => {
                                 if (id) hits.push(id);
                         }
                 });
-
                 kit.setSelectedItems(new Set(hits));
         }
 
         const dragHandler = createDragHandler<xy>({
                 onStart: (e) => {
-                        if (e.button !== 0 && !kit.focus()) return;
+                        if (e.button !== 0) return;
 
                         const coords = clientToCanvasCoords(
                                 e.clientX,
@@ -110,24 +110,25 @@ export const Selector: Component<props> = ({ kit }) => {
 
                         setCurrentPos(coords);
                 },
-                onEnd: () => {
+                onEnd: (_, xy) => {
                         setIsDragging(false);
                         detectSelection();
                 },
                 disableSelection: true,
         });
+        const onPointerDown = (e: PointerEvent) => {
+                if (!kit.focus()) return;
+                dragHandler.onPointerDown(e);
+        };
 
         onMount(() => {
-                kit.container?.addEventListener(
-                        "pointerdown",
-                        dragHandler.onPointerDown,
-                );
+                kit.container?.addEventListener("pointerdown", onPointerDown);
         });
 
         onCleanup(() => {
                 kit.container?.removeEventListener(
                         "pointerdown",
-                        dragHandler.onPointerDown,
+                        onPointerDown,
                 );
         });
 
