@@ -91,12 +91,6 @@ export const EdgeLogic = (
 
         const axes = helper?.isCorner ? cornerAxes : [helper?.single];
 
-        const cursor = helper?.isCorner
-                ? props.side === "tl" || props.side === "br"
-                        ? "nwse-resize"
-                        : "nesw-resize"
-                : helper?.single?.cursor ?? "default";
-
         const dragHandler = createDragHandler<
                 {
                         width: number;

@@ -9,6 +9,7 @@ export default defineConfig({
                                 __dirname,
                                 "../src/index.tsx",
                         ),
+                        src: path.resolve(__dirname, "../src"),
                 },
                 dedupe: ["solid-js", "solid-js/web", "solid-js/store"],
                 conditions: ["development", "browser"],

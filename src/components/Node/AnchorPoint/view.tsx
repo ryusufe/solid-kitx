@@ -13,7 +13,7 @@ export const AnchorPointView = (
                 <div
                         ref={state.anchorRef}
                         class="node-anchor"
-                        onPointerDown={logic.onPointerDown}
+                        on:pointerdown={logic.onPointerDown}
                 ></div>
         );
 };

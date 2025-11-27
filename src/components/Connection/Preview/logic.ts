@@ -22,11 +22,10 @@ export const PreviewLogic = (
         };
 
         onMount(() => {
-                window.addEventListener("mousemove", onMouseMove);
+                window.addEventListener("pointermove", onMouseMove);
         });
         onCleanup(() => {
-                window.removeEventListener("mousemove", onMouseMove);
+                window.removeEventListener("pointermove", onMouseMove);
         });
         return {};
 };
-

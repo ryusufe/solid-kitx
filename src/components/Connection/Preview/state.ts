@@ -12,10 +12,11 @@ export const createPreviewState = (
         props: PreviewProps,
         helper?: HelperType,
 ): StateType => {
+        const start = props.kit.activeConnectionDestination() as xy;
+        const startPos = props.kit.activeConnection.from!.side;
         const path = createMemo(() => {
-                const startPos = props.kit.activeConnection.from!.side;
                 return createPath({
-                        start: props.kit.activeConnectionDestination() as xy,
+                        start,
                         startPos,
                         end: props.kit.activeConnectionDestination() as xy,
                         endPos:
@@ -28,4 +29,3 @@ export const createPreviewState = (
         });
         return { path };
 };
-

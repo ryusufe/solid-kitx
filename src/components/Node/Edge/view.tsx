@@ -21,7 +21,7 @@ export const EdgeView = (
                         }}
                         onpointerenter={logic.onPointerEnter}
                         onpointerleave={logic.onPointerLeave}
-                        onPointerDown={logic.onPointerDown}
+                        on:pointerdown={logic.onPointerDown}
                 >
                         <Show
                                 when={
