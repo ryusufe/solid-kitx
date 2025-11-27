@@ -2,7 +2,7 @@ import { createEffect, createSignal, on, splitProps } from "solid-js";
 import { createStore, unwrap } from "solid-js/store";
 import {
         type Kit,
-        type SolidKitProps,
+        type SolidKitxProps,
         type ActiveConnectionType,
         xy,
 } from "../types";
@@ -13,7 +13,7 @@ import { configKeys, ConfigsType } from "../types/configs";
 //         connections: ConnectionType[];
 // }
 
-export const createKit = (props: SolidKitProps): Kit => {
+export const createKit = (props: SolidKitxProps): Kit => {
         const [nodes, setNodes] = props.nodesStore;
         const [connections, setConnections] = props.connectionsStore;
         const [viewport, setViewport] = createSignal(

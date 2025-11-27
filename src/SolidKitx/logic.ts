@@ -1,45 +1,35 @@
-import {
-        children,
-        createEffect,
-        createMemo,
-        For,
-        on,
-        onCleanup,
-        onMount,
-        Show,
-} from "solid-js";
-import { ConnectionType, NodeType, SolidKitProps, xy } from "./types";
-import Node from "./components/Node/Node";
-import { createKit } from "./core/createKit";
-import Connection from "./components/Connection/Connection";
-import ConnectionPreview from "./components/Connection/ConnectionPreview";
+import type { StateType } from "./state";
+import type { HelperType } from "./helper";
+import { SolidKitxProps, xy } from "src/types";
 import { reconcile } from "solid-js/store";
-import { onConfigListener } from "./utils/events";
+import { onConfigListener } from "src/utils/events";
+import { onCleanup, onMount } from "solid-js";
 
-export const SolidKitx = (props: SolidKitProps) => {
-        const kit = createKit(props);
-        const Children = () => {
-                const c = props.children;
-                return typeof c === "function" ? c(kit) : c;
-        };
+export type LogicType = {
+        onPointerDown: (
+                e: PointerEvent & { currentTarget: HTMLDivElement },
+        ) => void;
+};
 
-        const vp = createMemo(() => kit.viewport());
-
+export const SolidKitxLogic = (
+        state: StateType,
+        props: SolidKitxProps,
+        helper?: HelperType,
+): LogicType => {
         let startvp = { x: 0, y: 0, zoom: 1 };
 
         const pointers = new Map<number, xy>();
-        // pinch
         let iniPinx = 0;
         const onPointerDown = (
                 e: PointerEvent & { currentTarget: HTMLDivElement },
         ) => {
-                if (kit.focus()) return;
+                if (state.kit.focus()) return;
                 if ((e.target as HTMLElement).closest(".node")) return;
 
                 pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
                 if (pointers.size === 1) {
-                        startvp = kit.viewport();
+                        startvp = state.kit.viewport();
                 }
 
                 if (pointers.size === 2) {
@@ -82,7 +72,8 @@ export const SolidKitx = (props: SolidKitProps) => {
                         const centerX = (p1.x + p2.x) / 2;
                         const centerY = (p1.y + p2.y) / 2;
 
-                        const rect = containerRef?.getBoundingClientRect();
+                        const rect =
+                                state.containerRef?.getBoundingClientRect();
                         if (!rect) return;
 
                         const cursorX = centerX - rect.left;
@@ -95,13 +86,13 @@ export const SolidKitx = (props: SolidKitProps) => {
                                 cursorY -
                                 (cursorY - startvp.y) * (zoom / startvp.zoom);
 
-                        kit.setViewport({ zoom, x, y });
+                        state.kit.setViewport({ zoom, x, y });
                 } else if (pointers.size === 1) {
                         const dx = e.clientX - prevPointer.x;
                         const dy = e.clientY - prevPointer.y;
 
-                        const prev = kit.viewport();
-                        kit.setViewport({
+                        const prev = state.kit.viewport();
+                        state.kit.setViewport({
                                 ...prev,
                                 x: prev.x + dx,
                                 y: prev.y + dy,
@@ -113,8 +104,8 @@ export const SolidKitx = (props: SolidKitProps) => {
                 pointers.delete(e.pointerId);
 
                 if (pointers.size === 0) {
-                        if (startvp !== kit.viewport()) {
-                                kit.updateViewport();
+                        if (startvp !== state.kit.viewport()) {
+                                state.kit.updateViewport();
                         }
                         window.removeEventListener(
                                 "pointermove",
@@ -130,7 +121,7 @@ export const SolidKitx = (props: SolidKitProps) => {
         };
 
         const onWheel = (e: WheelEvent) => {
-                if (kit.focus()) return;
+                if (state.kit.focus()) return;
                 e.preventDefault();
 
                 const rect = (
@@ -139,7 +130,7 @@ export const SolidKitx = (props: SolidKitProps) => {
                 const cursorX = e.clientX - rect.left;
                 const cursorY = e.clientY - rect.top;
 
-                const prev = kit.viewport();
+                const prev = state.kit.viewport();
                 const oldZoom = prev.zoom;
                 const newZoom = oldZoom - e.deltaY * 0.001;
                 const zoom = Math.max(
@@ -149,7 +140,7 @@ export const SolidKitx = (props: SolidKitProps) => {
 
                 const x = cursorX - ((cursorX - prev.x) / oldZoom) * zoom;
                 const y = cursorY - ((cursorY - prev.y) / oldZoom) * zoom;
-                kit.setViewport({
+                state.kit.setViewport({
                         zoom,
                         x,
                         y,
@@ -157,24 +148,23 @@ export const SolidKitx = (props: SolidKitProps) => {
         };
 
         const onScrollEnd = () => {
-                if (startvp !== kit.viewport()) {
-                        kit.updateViewport();
-                        startvp = kit.viewport();
+                if (startvp !== state.kit.viewport()) {
+                        state.kit.updateViewport();
+                        startvp = state.kit.viewport();
                 }
         };
 
-        let containerRef!: HTMLDivElement;
         const updateRect = () => {
-                if (containerRef) {
-                        kit.container = containerRef;
+                if (state.containerRef) {
+                        state.kit.container = state.containerRef;
                 }
         };
         const onKeyDown = (e: KeyboardEvent) => {
-                const selected = kit.selectedItems();
+                const selected = state.kit.selectedItems();
                 if (e.key === "Delete" && selected.size > 0) {
-                        kit.setConnections(
+                        state.kit.setConnections(
                                 reconcile(
-                                        kit.connections.filter(
+                                        state.kit.connections.filter(
                                                 (c) =>
                                                         !selected.has(c.id) &&
                                                         !selected.has(
@@ -184,21 +174,21 @@ export const SolidKitx = (props: SolidKitProps) => {
                                         ),
                                 ),
                         );
-                        kit.setNodes(
+                        state.kit.setNodes(
                                 reconcile(
-                                        kit.nodes.filter(
+                                        state.kit.nodes.filter(
                                                 (n) => !selected.has(n.id),
                                         ),
                                 ),
                         );
-                        kit.updateNodes();
-                        kit.updateConnections();
+                        state.kit.updateNodes();
+                        state.kit.updateConnections();
                         selected.clear();
-                        kit.setSelectedItems(selected);
+                        state.kit.setSelectedItems(selected);
                 }
         };
         onConfigListener(
-                () => containerRef,
+                () => state.containerRef,
                 () => !props.disableZoom,
                 "wheel",
                 onWheel,
@@ -210,7 +200,7 @@ export const SolidKitx = (props: SolidKitProps) => {
                 onScrollEnd,
         );
         onConfigListener(
-                () => containerRef,
+                () => state.containerRef,
                 () => !props.disableKeyboardShortcuts,
                 "keydown",
                 onKeyDown,
@@ -225,57 +215,6 @@ export const SolidKitx = (props: SolidKitProps) => {
                 window.removeEventListener("pointerup", onPointerUp);
                 window.removeEventListener("pointercancel", onPointerUp);
         });
-
-        return (
-                <div
-                        ref={containerRef}
-                        class="solid-kitx"
-                        onpointerdown={onPointerDown}
-                        tabindex={0}
-                        autofocus
-                        style={{ outline: "none" }}
-                >
-                        <div
-                                class="container"
-                                style={{
-                                        "transform-origin": "0 0",
-                                        transform: `translate(${vp().x}px, ${
-                                                vp().y
-                                        }px) scale(${vp().zoom})`,
-                                }}
-                        >
-                                <For each={kit.connections}>
-                                        {(connection) => (
-                                                <Connection
-                                                        connection={connection}
-                                                        Toolbar={
-                                                                props
-                                                                        .components?.[
-                                                                        "connection-toolbar"
-                                                                ]
-                                                        }
-                                                        kit={kit}
-                                                />
-                                        )}
-                                </For>
-
-                                <Show when={kit.activeConnectionDestination()}>
-                                        <ConnectionPreview kit={kit} />
-                                </Show>
-
-                                <For each={kit.nodes}>
-                                        {(node) => (
-                                                <Node
-                                                        node={node}
-                                                        components={
-                                                                props.components
-                                                        }
-                                                        kit={kit}
-                                                />
-                                        )}
-                                </For>
-                        </div>
-                        <Children />
-                </div>
-        );
+        return { onPointerDown };
 };
+

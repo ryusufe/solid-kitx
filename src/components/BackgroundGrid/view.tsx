@@ -1,16 +1,14 @@
-import { Component, createMemo } from "solid-js";
-import { Kit } from "../types";
+import { BackgroundGridProps } from ".";
+import type { StateType } from "./state";
+import type { LogicType } from "./logic";
+import type { HelperType } from "./helper";
 
-export const BackgroundGrid: Component<{
-        kit: Kit;
-        absoluteGrid?: number;
-}> = (props) => {
-        const grid = createMemo(
-                () => props.absoluteGrid ?? props.kit.configs.gridSize ?? 30,
-        );
-        const vp = createMemo(() => props.kit.viewport());
-        const dif = createMemo(() => grid() * vp().zoom);
-
+export const BackgroundGridView = (
+        state: StateType,
+        logic: LogicType,
+        props: BackgroundGridProps,
+        helper?: HelperType,
+) => {
         return (
                 <svg
                         class="background-grid"
@@ -22,17 +20,17 @@ export const BackgroundGrid: Component<{
                 >
                         <pattern
                                 id="grid-pattern"
-                                x={vp().x + dif() / 2}
-                                y={vp().y + dif() / 2}
-                                width={dif()}
-                                height={dif()}
+                                x={state.vp().x + state.dif() / 2}
+                                y={state.vp().y + state.dif() / 2}
+                                width={state.dif()}
+                                height={state.dif()}
                                 patternUnits="userSpaceOnUse"
                         >
                                 <circle
                                         fill="currentColor"
-                                        cx={vp().zoom}
-                                        cy={vp().zoom}
-                                        r={vp().zoom}
+                                        cx={state.vp().zoom}
+                                        cy={state.vp().zoom}
+                                        r={state.vp().zoom}
                                 ></circle>
                         </pattern>
                         <rect
@@ -45,3 +43,4 @@ export const BackgroundGrid: Component<{
                 </svg>
         );
 };
+

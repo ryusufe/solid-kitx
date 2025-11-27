@@ -1,42 +1,46 @@
-import { Component } from "solid-js";
 import {
-        snapToGrid,
-        disableUserSelect,
-        enableUserSelect,
-        clientToCanvasCoords,
-} from "../../utils/events";
-import {
+        ConnectionNode,
         ConnectionType,
         NodeType,
         Position,
-        Kit,
         PositionList,
         xy,
-        ConnectionNode,
-} from "../../types";
+} from "src/types";
+import { AnchorPointProps } from ".";
+import type { StateType } from "./state";
+import {
+        clientToCanvasCoords,
+        disableUserSelect,
+        enableUserSelect,
+        snapToGrid,
+} from "src/utils/events";
 import { reconcile } from "solid-js/store";
+import { HelperType } from "./helper";
 
-const AnchorPoint: Component<{
-        side: Position;
-        kit: Kit;
-        id: string;
-}> = (props) => {
-        let anchorRef!: HTMLDivElement;
+export type LogicType = {
+        onPointerDown: (e: PointerEvent) => void;
+};
+
+export const AnchorPointLogic = (
+        state: StateType,
+        props?: AnchorPointProps,
+        helper?: HelperType,
+): LogicType => {
         let pointerStartPos: xy | null = null;
         let dragging = false;
 
         const onPointerMove = (e: PointerEvent) => {
-                if (!props.kit.activeConnection.from) return;
+                if (!props?.kit.activeConnection.from) return;
 
                 const coords = clientToCanvasCoords(
                         e.clientX,
                         e.clientY,
-                        props.kit.viewport(),
-                        props.kit.container?.getBoundingClientRect()!,
+                        props?.kit.viewport(),
+                        props?.kit.container?.getBoundingClientRect()!,
                 );
 
                 if (coords) {
-                        props.kit.setActiveConnectionDestination(coords);
+                        props?.kit.setActiveConnectionDestination(coords);
                 }
         };
 
@@ -45,8 +49,8 @@ const AnchorPoint: Component<{
                         cleanupConnection();
                         return;
                 }
-                const kit = props.kit;
-                if (kit.activeConnection.from) {
+                const kit = props?.kit;
+                if (kit && kit.activeConnection.from) {
                         let to = kit.activeConnection.to;
                         // Making a new node if it's not connected to  any => to : id + side
                         if (
@@ -54,7 +58,7 @@ const AnchorPoint: Component<{
                                 !kit.configs.disableAnchorConnectionCreation
                         ) {
                                 const dest = kit.activeConnectionDestination();
-                                const gridSize = props.kit.configs.gridSize!;
+                                const gridSize = props?.kit.configs.gridSize!;
                                 if (dest) {
                                         const x = snapToGrid(
                                                 dest.x - 75,
@@ -119,26 +123,27 @@ const AnchorPoint: Component<{
         };
 
         const startConnection = () => {
-                if (!anchorRef) return;
+                if (!state.anchorRef) return;
                 const { x, y, width, height } =
-                        anchorRef.getBoundingClientRect();
+                        state.anchorRef.getBoundingClientRect();
                 disableUserSelect();
-                props.kit.activeConnection = {
-                        from: {
-                                side: props.side,
-                                id: props.id,
-                        },
-                };
+                props &&
+                        (props.kit.activeConnection = {
+                                from: {
+                                        side: props?.side,
+                                        id: props?.id,
+                                },
+                        });
 
                 const coords = clientToCanvasCoords(
                         x + width / 2,
                         y + height / 2,
-                        props.kit.viewport(),
-                        props.kit.container?.getBoundingClientRect()!,
+                        props?.kit.viewport()!,
+                        props?.kit.container?.getBoundingClientRect()!,
                 );
 
                 if (coords) {
-                        props.kit.setActiveConnectionDestination(coords);
+                        props?.kit.setActiveConnectionDestination(coords);
                 }
         };
 
@@ -158,21 +163,14 @@ const AnchorPoint: Component<{
 
         const cleanupConnection = () => {
                 enableUserSelect();
-                props.kit.setActiveConnectionDestination(null);
-                props.kit.activeConnection = {};
+                if (props) {
+                        props.kit.setActiveConnectionDestination(null);
+                        props.kit.activeConnection = {};
+                }
                 window.removeEventListener("pointermove", onPointerMove);
                 window.removeEventListener("pointerup", onUp);
                 window.removeEventListener("pointercancel", onUp);
                 pointerStartPos = null;
         };
-
-        return (
-                <div
-                        ref={anchorRef}
-                        class="node-anchor"
-                        onPointerDown={onPointerDown}
-                ></div>
-        );
+        return { onPointerDown };
 };
-
-export default AnchorPoint;

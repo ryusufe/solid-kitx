@@ -1,17 +1,26 @@
-import { Component, createMemo, Show } from "solid-js";
-import { Kit, NodeType, Position, ViewPort, xy } from "../../types";
-import AnchorPoint from "./AnchorPoint";
-import { createDragHandler, calculateDelta } from "../../utils/events";
+import { EdgeProps } from ".";
+import type { StateType } from "./state";
+import type { HelperType } from "./helper";
+import { calculateDelta, createDragHandler } from "src/utils/events";
+import { NodeType, Position, ViewPort, xy } from "src/types";
 
-export type EdgePosition = Position | "tr" | "tl" | "br" | "bl";
+export type LogicType = {
+        onPointerDown: (e: PointerEvent) => void;
+        onPointerEnter: (e: PointerEvent) => void;
+        onPointerLeave: (e: PointerEvent) => void;
+        positionStyle: {
+                top?: string;
+                left?: string;
+                right?: string;
+                bottom?: string;
+        };
+};
 
-const Edge: Component<{
-        side: EdgePosition;
-        node: NodeType;
-        kit: Kit;
-}> = (props) => {
-        const isCorner = ["tl", "tr", "bl", "br"].includes(props.side);
-
+export const EdgeLogic = (
+        state: StateType,
+        props: EdgeProps,
+        helper?: HelperType,
+): LogicType => {
         const clamp = (value: number, min: number, max: number) =>
                 Math.max(min, Math.min(value, max));
 
@@ -56,12 +65,6 @@ const Edge: Component<{
                                 };
                 }
         })();
-        const single = {
-                top: { axis: "y", sign: -1, cursor: "ns-resize" },
-                bottom: { axis: "y", sign: 1, cursor: "ns-resize" },
-                left: { axis: "x", sign: -1, cursor: "ew-resize" },
-                right: { axis: "x", sign: 1, cursor: "ew-resize" },
-        }[props.side as Position];
 
         const cornerAxes =
                 props.side === "tl"
@@ -86,36 +89,13 @@ const Edge: Component<{
                           ]
                         : [];
 
-        const axes = isCorner ? cornerAxes : [single];
+        const axes = helper?.isCorner ? cornerAxes : [helper?.single];
 
-        const cursor = isCorner
+        const cursor = helper?.isCorner
                 ? props.side === "tl" || props.side === "br"
                         ? "nwse-resize"
                         : "nesw-resize"
-                : single?.cursor ?? "default";
-
-        const size = createMemo(() => {
-                if (props.kit.configs.disableEdgeDrag) return {};
-                const thickness = "calc(var(--node-border-width, 2px) + 10px)";
-
-                return isCorner
-                        ? {
-                                  width: thickness,
-                                  height: thickness,
-                                  "--cursor": cursor,
-                          }
-                        : {
-                                  width:
-                                          single.axis === "y"
-                                                  ? "100%"
-                                                  : thickness,
-                                  height:
-                                          single.axis === "y"
-                                                  ? thickness
-                                                  : "100%",
-                                  "--cursor": cursor,
-                          };
-        });
+                : helper?.single?.cursor ?? "default";
 
         const dragHandler = createDragHandler<
                 {
@@ -145,7 +125,7 @@ const Edge: Component<{
                         for (const a of axes) {
                                 const zoom = vp.zoom;
                                 const delta =
-                                        a.axis === "x"
+                                        a?.axis === "x"
                                                 ? calculateDelta(
                                                           e.clientX,
                                                           startNode.clientX,
@@ -158,9 +138,9 @@ const Edge: Component<{
                                                           zoom,
                                                           gridSize,
                                                   );
-                                const diff = delta * a.sign;
+                                const diff = delta * (a?.sign ?? 1);
 
-                                if (a.axis === "x") {
+                                if (a?.axis === "x") {
                                         let newWidth = width + diff;
                                         const clampedWidth =
                                                 getRespectedWidth(newWidth);
@@ -221,9 +201,9 @@ const Edge: Component<{
                 dragHandler.onPointerDown(e);
         };
 
-        const onPinterEnter = () => {
+        const onPointerEnter = () => {
                 const { from } = props.kit.activeConnection;
-                if (!from || isCorner) return;
+                if (!from || helper?.isCorner) return;
                 props.kit.activeConnection = {
                         from,
                         to: {
@@ -242,31 +222,5 @@ const Edge: Component<{
                 };
         };
 
-        return (
-                <div
-                        class="node-edge"
-                        style={{
-                                ...size(),
-                                ...positionStyle,
-                        }}
-                        onpointerenter={onPinterEnter}
-                        onpointerleave={onPointerLeave}
-                        onPointerDown={onPointerDown}
-                >
-                        <Show
-                                when={
-                                        !isCorner &&
-                                        !props.kit.configs.disableNodeAnchors
-                                }
-                        >
-                                <AnchorPoint
-                                        side={props.side as Position}
-                                        kit={props.kit}
-                                        id={props.node.id}
-                                />
-                        </Show>
-                </div>
-        );
+        return { onPointerLeave, onPointerDown, onPointerEnter, positionStyle };
 };
-
-export default Edge;
