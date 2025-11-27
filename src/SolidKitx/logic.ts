@@ -160,31 +160,40 @@ export const SolidKitxLogic = (
                 }
         };
         const onKeyDown = (e: KeyboardEvent) => {
-                const selected = state.kit.selectedItems();
-                if (e.key === "Delete" && selected.size > 0) {
+                const selection = state.kit.selection;
+                if (e.key === "Delete" && selection.length() > 0) {
+                        const selectedConnections = selection.getConnections();
                         state.kit.setConnections(
                                 reconcile(
                                         state.kit.connections.filter(
                                                 (c) =>
-                                                        !selected.has(c.id) &&
-                                                        !selected.has(
+                                                        !selectedConnections.includes(
+                                                                c.id,
+                                                        ) &&
+                                                        !selectedConnections.includes(
                                                                 c.from.id,
                                                         ) &&
-                                                        !selected.has(c.to.id),
+                                                        !selectedConnections.includes(
+                                                                c.to.id,
+                                                        ),
                                         ),
                                 ),
                         );
+                        const selectedNodes = selection.getNodes();
                         state.kit.setNodes(
                                 reconcile(
                                         state.kit.nodes.filter(
-                                                (n) => !selected.has(n.id),
+                                                (n) =>
+                                                        !selectedNodes.includes(
+                                                                n.id,
+                                                        ),
                                         ),
                                 ),
                         );
-                        state.kit.updateNodes();
-                        state.kit.updateConnections();
-                        selected.clear();
-                        state.kit.setSelectedItems(selected);
+                        selectedConnections.length > 0 &&
+                                state.kit.updateConnections();
+                        selectedNodes.length > 0 && state.kit.updateNodes();
+                        selection.clear();
                 }
         };
         onConfigListener(
@@ -217,4 +226,3 @@ export const SolidKitxLogic = (
         });
         return { onPointerDown };
 };
-

@@ -25,10 +25,9 @@ export const createNodeState = (
         const Toolbar = createMemo(() => "node-toolbar" in props.components!);
         //
         const selected = createMemo(() => {
-                const selectedSet = props.kit.selectedItems();
-                return selectedSet.has(props.node.id);
+                const selectedSet = props.kit.selection.getNodes();
+                return selectedSet.includes(props.node.id);
         });
 
         return { type, nodeDiv, hasComponent, Toolbar, selected };
 };
-

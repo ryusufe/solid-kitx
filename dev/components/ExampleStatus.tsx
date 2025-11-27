@@ -1,6 +1,6 @@
 import { Component, createMemo, createSignal, For } from "solid-js";
 import { reconcile } from "solid-js/store";
-import { Kit, NodeType } from "solid-kitx";
+import { Kit, NodeType, SelectionType } from "solid-kitx";
 const colors = [
         "#fee440",
         "#00f6ed",
@@ -39,10 +39,10 @@ const colors = [
 const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
         let property = "outline-color";
         const selected = createMemo((prev) => {
-                const selectedItems = props.kit.selectedItems();
-                const size = selectedItems.size;
-                if (size === 0) return "Select a node";
-                const s = selectedItems.values().next().value;
+                const selection: SelectionType = props.kit.selection;
+                const nodes = selection.getNodes();
+                if (nodes.length === 0) return "Select a node";
+                const s = nodes[0];
                 if (s === props.node.id)
                         return typeof prev === "string"
                                 ? prev
@@ -54,8 +54,7 @@ const ExampleStatus: Component<{ kit: Kit; node: NodeType }> = (props) => {
                 props.kit.setNodes(
                         reconcile(
                                 props.kit.nodes.map((n) =>
-                                        n.id ===
-                                        selected()?.split("-container")[0]
+                                        n.id === selected()
                                                 ? {
                                                           ...n,
                                                           style: {

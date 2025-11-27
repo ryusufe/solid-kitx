@@ -16,7 +16,10 @@ export const SelectorLogic = (
                 const r = state.rect();
                 if (r.width < 5 || r.height < 5) return;
                 const bounds = props.kit.container!.getBoundingClientRect();
-                const hits: string[] = [];
+                const hits: { nodes: string[]; connections: string[] } = {
+                        nodes: [],
+                        connections: [],
+                };
 
                 const elements =
                         props.kit.container!.querySelectorAll<HTMLElement>(
@@ -25,7 +28,6 @@ export const SelectorLogic = (
 
                 elements.forEach((el) => {
                         const box = el.getBoundingClientRect();
-
                         const vp = props.kit.viewport();
 
                         const elRect = {
@@ -44,10 +46,14 @@ export const SelectorLogic = (
 
                         if (intersects) {
                                 const id = el.getAttribute("data-id");
-                                if (id) hits.push(id);
+                                const isNode = el.classList.contains("node");
+                                id &&
+                                        (isNode
+                                                ? hits.nodes.push(id)
+                                                : hits.connections.push(id));
                         }
                 });
-                props.kit.setSelectedItems(new Set(hits));
+                props.kit.selection.set(hits);
         }
 
         const dragHandler = createDragHandler<xy>({
@@ -105,4 +111,3 @@ export const SelectorLogic = (
         });
         return {};
 };
-

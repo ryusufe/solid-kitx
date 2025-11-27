@@ -7,6 +7,7 @@ import {
         xy,
 } from "../types";
 import { configKeys, ConfigsType } from "../types/configs";
+import { Selection } from "src/utils/selection";
 
 // interface History {
 //         nodes: NodeType[];
@@ -21,9 +22,7 @@ export const createKit = (props: SolidKitxProps): Kit => {
         );
 
         const [focus, setFocus] = createSignal(false);
-        const [selectedItems, setSelectedItems] = createSignal(
-                new Set<string>(),
-        );
+        const selection = Selection();
         const [activeConnectionDestination, setActiveConnectionDestination] =
                 createSignal<xy | null>(null);
 
@@ -128,8 +127,7 @@ export const createKit = (props: SolidKitxProps): Kit => {
                 setViewport,
                 focus,
                 setFocus,
-                selectedItems,
-                setSelectedItems,
+                selection,
                 activeConnectionDestination,
                 setActiveConnectionDestination,
                 activeConnection: {} as ActiveConnectionType,

@@ -19,8 +19,8 @@ export const createConnectionState = (
         let connectionRef!: SVGPathElement;
         let toolbarRef!: HTMLDivElement;
         const selected = createMemo(() => {
-                const selectedSet = props.kit.selectedItems();
-                return selectedSet.has(props.connection.id);
+                const selectedSet = props.kit.selection.getConnections();
+                return selectedSet.includes(props.connection.id);
         });
         const coords = createMemo(() => {
                 const { from, to } = props.connection;
@@ -78,4 +78,3 @@ export const createConnectionState = (
         });
         return { connectionRef, toolbarRef, mid, path, selected };
 };
-

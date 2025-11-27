@@ -4,6 +4,7 @@ import type { NodeType } from "./node";
 import { ConnectionType, ActiveConnectionType } from "./connection";
 import { Viewport, xy } from "./viewport";
 import { ConfigsType } from "./configs";
+import { SelectionType } from "src/types";
 
 export interface Kit {
         nodes: NodeType[];
@@ -18,8 +19,7 @@ export interface Kit {
         focus: Accessor<boolean>;
         setFocus: Setter<boolean>;
 
-        selectedItems: () => Set<string>;
-        setSelectedItems: Setter<Set<string>>;
+        selection: SelectionType;
 
         activeConnectionDestination: () => xy | null;
         setActiveConnectionDestination: Setter<xy | null>;

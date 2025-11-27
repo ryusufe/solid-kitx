@@ -15,13 +15,12 @@ export const ConnectionLogic = (
         helper?: HelperType,
 ): LogicType => {
         const setSelected = (value: boolean) => {
-                const current = new Set(props.kit.selectedItems());
+                const current = props.kit.selection;
                 if (value) {
-                        current.add(props.connection.id);
+                        current.addItem(props.connection.id, "connection");
                 } else {
-                        current.delete(props.connection.id);
+                        current.removeItem(props.connection.id, "connection");
                 }
-                props.kit.setSelectedItems(current);
         };
 
         const setLabel = (label?: string) => {
@@ -82,4 +81,3 @@ export const ConnectionLogic = (
         });
         return { setLabel, onpointerdown };
 };
-

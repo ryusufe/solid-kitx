@@ -11,4 +11,5 @@ export type {
         NodeToolbarProps,
         ConnectionToolbarProps,
         ConfigsType,
+        SelectionType,
 } from "./types";

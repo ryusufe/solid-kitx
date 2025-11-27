@@ -18,13 +18,12 @@ export const NodeLogic = (
 ): LogicType => {
         const controller = new AbortController();
         const setSelected = (value: boolean) => {
-                const current = new Set(props.kit.selectedItems());
+                const current = props.kit.selection;
                 if (value) {
-                        current.add(props.node.id);
+                        current.addItem(props.node.id, "node");
                 } else {
-                        current.delete(props.node.id);
+                        current.removeItem(props.node.id, "node");
                 }
-                props.kit.setSelectedItems(current);
         };
 
         const dragHandler = createDragHandler<
@@ -157,4 +156,3 @@ export const NodeLogic = (
         });
         return { onPointerDown };
 };
-
