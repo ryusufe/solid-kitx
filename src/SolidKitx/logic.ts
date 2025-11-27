@@ -163,6 +163,7 @@ export const SolidKitxLogic = (
                 const selection = state.kit.selection;
                 if (e.key === "Delete" && selection.length() > 0) {
                         const selectedConnections = selection.getConnections();
+                        const selectedNodes = selection.getNodes();
                         state.kit.setConnections(
                                 reconcile(
                                         state.kit.connections.filter(
@@ -170,16 +171,15 @@ export const SolidKitxLogic = (
                                                         !selectedConnections.includes(
                                                                 c.id,
                                                         ) &&
-                                                        !selectedConnections.includes(
+                                                        !selectedNodes.includes(
                                                                 c.from.id,
                                                         ) &&
-                                                        !selectedConnections.includes(
+                                                        !selectedNodes.includes(
                                                                 c.to.id,
                                                         ),
                                         ),
                                 ),
                         );
-                        const selectedNodes = selection.getNodes();
                         state.kit.setNodes(
                                 reconcile(
                                         state.kit.nodes.filter(
