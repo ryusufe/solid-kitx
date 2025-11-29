@@ -3,7 +3,7 @@ import type { HelperType } from "./helper";
 import { SolidKitxProps, xy } from "src/types";
 import { reconcile } from "solid-js/store";
 import { onConfigListener } from "src/utils/events";
-import { onCleanup, onMount } from "solid-js";
+import { batch, onCleanup, onMount } from "solid-js";
 
 export type LogicType = {
         onPointerDown: (
@@ -45,7 +45,11 @@ export const SolidKitxLogic = (
         };
 
         const onPointerMove = (e: PointerEvent) => {
-                if (!pointers.has(e.pointerId)) return;
+                if (
+                        !pointers.has(e.pointerId) ||
+                        (props.disableHorizontalPan && props.disableVerticalPan)
+                )
+                        return;
 
                 const prevPointer = pointers.get(e.pointerId);
                 if (!prevPointer) return;
@@ -88,8 +92,12 @@ export const SolidKitxLogic = (
 
                         state.kit.setViewport({ zoom, x, y });
                 } else if (pointers.size === 1) {
-                        const dx = e.clientX - prevPointer.x;
-                        const dy = e.clientY - prevPointer.y;
+                        const dx = props.disableHorizontalPan
+                                ? 0
+                                : e.clientX - prevPointer.x;
+                        const dy = props.disableVerticalPan
+                                ? 0
+                                : e.clientY - prevPointer.y;
 
                         const prev = state.kit.viewport();
                         state.kit.setViewport({

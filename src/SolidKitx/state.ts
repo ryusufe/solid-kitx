@@ -24,4 +24,3 @@ export const createSolidKitxState = (
         const vp = createMemo(() => kit.viewport());
         return { kit, containerRef, Children, vp };
 };
-

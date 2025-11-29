@@ -15,6 +15,8 @@ export const configKeys = [
         "disableNodeAnchors",
         "disableAnchorConnectionCreation",
         "disableKeyboardShortcuts",
+        "disableHorizontalPan",
+        "disableVerticalPan",
         // "enableHistory",
         // "historyLimit",
 ] as const;
@@ -53,4 +55,6 @@ export interface ConfigsType {
         // historyLimit?: number;
 
         // disallowOverlappingNodes?: boolean;
+        disableHorizontalPan?: boolean;
+        disableVerticalPan?: boolean;
 }

@@ -56,18 +56,21 @@ const App: Component = () => {
   const onConnectionsChange = () => {
         // save in db
   }
+  const onViewportChange = () => {
+        //
+  }
 
-  const [viewport, setViewport] = createSignal<ViewPort>({ x: 0, y: 0, zoom: 1 });
+  const viewportSignal = createSignal<ViewPort>({ x: 0, y: 0, zoom: 1 });
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
       <SolidKitx
         nodesStore={nodesStore}
         connectionsStore={connectionsStore}
-        viewport={viewport()}
-        onNodesChange={setNodes}
-        onConnectionsChange={setConnections}
-        onViewportChange={setViewport}
+        viewportSignal={viewportSignal}
+        onNodesChange={onNodesChange}
+        onConnectionsChange={onConnectionsChange}
+        onViewportChange={onViewportChange}
       />
     </div>
   );

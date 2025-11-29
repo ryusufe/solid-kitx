@@ -1,4 +1,4 @@
-import { JSX } from "solid-js";
+import { JSX, Signal } from "solid-js";
 import type { NodeType } from "./node";
 import type { ConnectionType } from "./connection";
 import type { ViewPort } from "./viewport";
@@ -13,7 +13,7 @@ export interface SolidKitxProps extends ConfigsType {
                 get: ConnectionType[],
                 set: SetStoreFunction<ConnectionType[]>,
         ];
-        viewport: ViewPort;
+        viewportSignal: Signal<ViewPort>;
         onViewportChange: (vp: ViewPort) => void;
         onNodesChange: (nodes: NodeType[]) => void;
         onConnectionsChange: (connections: ConnectionType[]) => void;
@@ -22,5 +22,4 @@ export interface SolidKitxProps extends ConfigsType {
         class?: string;
         children?: JSX.Element | ((kit: Kit) => JSX.Element);
         components?: ComponentsType;
-        disableZoom?: boolean;
 }

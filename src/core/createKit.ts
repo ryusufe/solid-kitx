@@ -17,9 +17,7 @@ import { Selection } from "src/utils/selection";
 export const createKit = (props: SolidKitxProps): Kit => {
         const [nodes, setNodes] = props.nodesStore;
         const [connections, setConnections] = props.connectionsStore;
-        const [viewport, setViewport] = createSignal(
-                props.viewport || { x: 0, y: 0, zoom: 1 },
-        );
+        const [viewport, setViewport] = props.viewportSignal;
 
         const [focus, setFocus] = createSignal(false);
         const selection = Selection();

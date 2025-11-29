@@ -24,9 +24,7 @@ const App: Component = () => {
         const connectionsStore = createStore<ConnectionType[]>(
                 data.connections,
         );
-        const [viewport, setViewport] = createSignal<DataType["viewport"]>(
-                data.viewport,
-        );
+        const viewportSignal = createSignal<ViewPort>(data.viewport);
 
         const onNodesChange = () => {
                 console.log("nodes changed");
@@ -56,9 +54,10 @@ const App: Component = () => {
                                 onNodesChange={onNodesChange}
                                 connectionsStore={connectionsStore}
                                 onConnectionsChange={onConnectionsChange}
-                                viewport={viewport()}
+                                viewportSignal={viewportSignal}
                                 onViewportChange={onViewportChange}
                                 gridSize={1}
+                                disableHorizontalPan
                                 defaultNode={defaultNode}
                                 components={{
                                         "node-toolbar": NodeToolbar,
