@@ -9,7 +9,7 @@ import { Kit } from "src/types";
 export type BackgroundGridProps = {
         kit: Kit;
         absoluteGrid?: number;
-};
+} & ({ type?: "dot" } | { type?: "dash"; dashWidth?: number });
 
 export const BackgroundGrid = createModule<
         StateType,

@@ -56,8 +56,6 @@ const App: Component = () => {
                                 onConnectionsChange={onConnectionsChange}
                                 viewportSignal={viewportSignal}
                                 onViewportChange={onViewportChange}
-                                gridSize={1}
-                                disableHorizontalPan
                                 defaultNode={defaultNode}
                                 components={{
                                         "node-toolbar": NodeToolbar,
@@ -70,7 +68,7 @@ const App: Component = () => {
                                         <>
                                                 <BackgroundGrid
                                                         kit={kit}
-                                                        absoluteGrid={30}
+                                                        type="dash"
                                                 />
                                                 <Selector kit={kit} />
                                                 <TopRightQA />

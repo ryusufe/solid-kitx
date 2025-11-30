@@ -133,26 +133,29 @@ export const SolidKitxLogic = (
                 e.preventDefault();
 
                 const rect = (
-                        e.target as HTMLDivElement
+                        e.currentTarget as HTMLDivElement
                 ).getBoundingClientRect();
-                const cursorX = e.clientX - rect.left;
-                const cursorY = e.clientY - rect.top;
+                const cx = e.clientX - rect.left;
+                const cy = e.clientY - rect.top;
 
                 const prev = state.kit.viewport();
                 const oldZoom = prev.zoom;
-                const newZoom = oldZoom - e.deltaY * 0.001;
-                const zoom = Math.max(
+
+                const newZoom = Math.max(
                         props.maxZoom ?? 0.1,
-                        Math.min(props.minZoom ?? 5, newZoom),
+                        Math.min(
+                                props.minZoom ?? 5,
+                                oldZoom - e.deltaY * 0.001,
+                        ),
                 );
 
-                const x = cursorX - ((cursorX - prev.x) / oldZoom) * zoom;
-                const y = cursorY - ((cursorY - prev.y) / oldZoom) * zoom;
-                state.kit.setViewport({
-                        zoom,
-                        x,
-                        y,
-                });
+                const wx = (cx - prev.x) / oldZoom;
+                const wy = (cy - prev.y) / oldZoom;
+
+                const x = cx - wx * newZoom;
+                const y = cy - wy * newZoom;
+
+                state.kit.setViewport({ zoom: newZoom, x, y });
         };
 
         const onScrollEnd = () => {

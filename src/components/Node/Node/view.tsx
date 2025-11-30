@@ -24,7 +24,9 @@ export const NodeView = (
                                 transform: `translate(${props.node.x}px, ${props.node.y}px)`,
                                 width: `${props.node.width}px`,
                                 height: `${props.node.height}px`,
-                                cursor: props.kit.focus() ? "auto" : "grab",
+                                "--node-cursor": props.kit.focus()
+                                        ? "auto"
+                                        : "grab",
                                 ...props.node.style,
                         }}
                 >
@@ -149,4 +151,3 @@ export const NodeView = (
                 </div>
         );
 };
-
