@@ -85,7 +85,7 @@ export const NodeLogic = (
         const onPointerDown = (
                 e: PointerEvent & { currentTarget: HTMLDivElement },
         ) => {
-                e.stopPropagation();
+                // if (props.kit.focus()) e.stopPropagation();
                 setSelected(true);
                 if (
                         e.button === 2 ||

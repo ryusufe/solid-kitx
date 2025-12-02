@@ -23,6 +23,7 @@ export const SolidKitxView = (
                         autofocus
                         style={{ outline: "none" }}
                 >
+                        <Children />
                         <div
                                 class="container"
                                 style={{
@@ -67,8 +68,6 @@ export const SolidKitxView = (
                                         )}
                                 </For>
                         </div>
-                        <Children />
                 </div>
         );
 };
-

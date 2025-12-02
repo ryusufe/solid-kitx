@@ -1,11 +1,10 @@
 import { JSX } from "solid-js";
-import { Kit } from "./kit";
 import { xy } from "./viewport";
 
 export interface NodeData<T = any> {
         label?: string;
         component?: string;
-        extra?: Record<string, T>;
+        extra?: T;
 }
 
 export interface NodeType<Data = any> extends xy {

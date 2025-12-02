@@ -38,6 +38,10 @@ export const NodeView = (
                                                 top: "var(--top, 0)",
                                                 left: "var(--left, calc(100% + 1em))",
                                         }}
+                                        onPointerDown={(e) => {
+                                                console.log("p-down");
+                                                e.stopPropagation();
+                                        }}
                                 >
                                         <Dynamic
                                                 component={

@@ -4,7 +4,7 @@ A minimal, lightweight, and highly customizable node-based editor library for So
 
 <div align="center" style="font-size:2em;">
 <a  href="https://github.com/ryusufe/solid-kitx/wiki">📖Wiki</a>
-<a href="https://ryusufe.github.io/solid-kitx/">✨DEMO</a>
+<a href="https://ryusufe.github.io/solid-kitx/">✨DEMO (Kitx Lab)</a>
 <a  href="https://buymeacoffee.com/ryusufe">💖Support</a>
 </div>
 
@@ -78,4 +78,13 @@ const App: Component = () => {
 
 export default App;
 ```
+# Kitx Lab
 
+KitX Lab is an experimental space for visualizing ideas using nodes and connections.
+It’s meant to help you map out structures, explore relationships, and think through systems in a more visual way.
+
+This project is still in active development, and many parts are incomplete or may change as it evolves.
+That's why it includes backup which you should always consider when finishing a design.
+
+Developers are welcome to contribute, experiment, or suggest ideas.
+If you want to explore the source code, everything is available in the `dev/` directory of this repository.
