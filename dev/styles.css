@@ -29,17 +29,6 @@ code {
 }
 
 
-.sidebar {
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        height: fit-content;
-        width: fit-content;
-        z-index: 100;
-        pointer-events: auto;
-        overflow-y: auto;
-        outline: none;
-}
 
 .node-preview {
         position: fixed;
@@ -586,10 +575,9 @@ code {
         gap: 6px;
 }
 
-.task-node textarea {
+textarea {
         width: 100%;
         padding: 6px 8px;
-        border: 1px solid #ccc;
         border-radius: 4px;
         font-size: 12px;
         font-family: inherit;
@@ -597,14 +585,16 @@ code {
         min-height: 60px;
         background: transparent;
         color: #000;
+        border: 1px solid transparent;
+        resize: none;
 }
 
-.task-node textarea:focus {
+textarea:focus {
         outline: none;
-        border-color: #1a73e8;
+        border-color: #ccc;
+        resize: both;
 }
 
-/* Dark mode styles for task-node */
 .dark .task-node .status-badge.completed {
         background: rgba(87, 171, 90, 0.2);
         color: #57ab5a;
@@ -624,11 +614,117 @@ code {
         background: #57ab5a;
 }
 
-.dark .task-node textarea {
-        border-color: #555;
+.dark textarea {
         color: #eee;
 }
 
-.dark .task-node textarea:focus {
-        border-color: #6D9EFF;
+.dark textarea:focus {
+        border-color: #555;
+}
+
+
+.settings-modal {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+                'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.settings-tab:hover {
+        background: var(--controls-button-bg, rgba(255, 255, 255, 0.5)) !important;
+}
+
+.settings-content::-webkit-scrollbar {
+        width: 8px;
+}
+
+.settings-content::-webkit-scrollbar-track {
+        background: transparent;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+        background: var(--node-outline-color, #e0e0e0);
+        border-radius: 4px;
+}
+
+.settings-content::-webkit-scrollbar-thumb:hover {
+        background: var(--node-outline, #c0c0c0);
+}
+
+
+.setting-action-button:hover {
+        background-color: var(--node-outline, #0d5fd8) !important;
+        box-shadow: 0 2px 6px rgba(26, 115, 232, 0.3);
+        transform: translateY(-1px);
+}
+
+.setting-action-button:active {
+        transform: translateY(0);
+}
+
+.close-button:hover {
+        background: var(--controls-bg, #f0f0f0) !important;
+}
+
+.close-button svg {
+        width: 20px;
+        height: 20px;
+        color: var(--node-color, #000000);
+}
+
+
+.dark .settings-modal {
+        background-color: var(--node-bg, #1e1e1e) !important;
+        color: var(--node-color, #ffffff) !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+}
+
+.dark .settings-sidebar {
+        background-color: var(--controls-bg, #2b2b2b) !important;
+        border-right: 1px solid var(--node-outline-color, #404040) !important;
+}
+
+.dark .settings-tab {
+        color: var(--node-color, #ffffff) !important;
+}
+
+.dark .settings-tab:hover {
+        background: var(--controls-button-bg, rgba(255, 255, 255, 0.1)) !important;
+}
+
+.dark .settings-tab.active {
+        background: var(--controls-button-bg, #333333) !important;
+}
+
+
+
+.dark .setting-item .icon-container {
+        background-color: var(--controls-button-bg, #333333) !important;
+}
+
+.dark .setting-item p {
+        color: var(--label-color, #aaaaaa) !important;
+}
+
+.dark .setting-action-button {
+        background-color: var(--node-outline, #4287f5) !important;
+}
+
+.dark .setting-action-button:hover {
+        background-color: var(--node-outline, #5a9cff) !important;
+        box-shadow: 0 2px 6px rgba(66, 135, 245, 0.4);
+}
+
+.dark .close-button:hover {
+        background: var(--controls-bg, #404040) !important;
+}
+
+.dark .close-button svg {
+        color: var(--node-color, #ffffff);
+}
+
+.dark .settings-content::-webkit-scrollbar-thumb {
+        background: var(--node-outline-color, #404040);
+}
+
+.dark .settings-content::-webkit-scrollbar-thumb:hover {
+        background: var(--node-outline, #595858);
 }

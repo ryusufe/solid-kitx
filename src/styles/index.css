@@ -31,10 +31,13 @@
                         box-shadow: var(--node-shadow, 0 2px 5px rgba(0, 0, 0, 0.1));
                         font-size: var(--node-font-size, 14px);
                         font-family: var(--node-font-family, sans-serif);
-                        cursor: var(--node-cursor, default);
                         display: flex;
                         justify-content: center;
                         align-items: center;
+
+                        &.unfocus * {
+                                cursor: grab;
+                        }
 
                         .node-edge {
                                 --off-v: -7px;
@@ -107,25 +110,24 @@
                 }
         }
 
-        .kit-controls {
+        .kitx-controls {
                 position: absolute;
-                bottom: 10px;
-                right: 10px;
                 display: flex;
                 flex-direction: var(--flex-direction, column);
+                height: fit-content;
                 gap: 1px;
                 z-index: 50;
-                background: var(--controls-bg, #ebebeb);
+                background: var(--controls-bg, #e4e4e4);
                 border-radius: 0.3rem;
                 box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.2);
                 overflow: hidden;
 
                 & button {
                         background: var(--controls-button-bg, #ffffff);
-                        /* border-radius: 0.4rem; */
                         border: 0;
+                        outline: none;
                         cursor: pointer;
-                        padding: 0.4em;
+                        /* padding: 0.4em; */
                         width: 2em;
                         height: 2em;
                         display: flex;
@@ -261,7 +263,7 @@
                 }
         }
 
-        .kit-controls {
+        .kitx-controls {
                 position: absolute;
                 bottom: 10px;
                 right: 10px;
@@ -269,7 +271,7 @@
                 flex-direction: var(--flex-direction, column);
                 gap: 1px;
                 z-index: 10;
-                background: var(--controls-bg, #2b2b2b);
+                background: var(--controls-bg, #212121);
                 border-radius: 0.3rem;
                 box-shadow: 0 0 4px 1px rgba(0, 0, 0, 0.6);
                 overflow: hidden;
@@ -278,9 +280,10 @@
                         background: var(--controls-button-bg, #333333);
                         border: 0;
                         cursor: pointer;
-                        padding: 0.4em;
-                        width: 2em;
-                        height: 2em;
+                        padding: 0.5em;
+                        box-sizing: border-box;
+                        width: 2.3em;
+                        height: 2.3em;
                         display: flex;
                         justify-content: center;
                         align-items: center;
@@ -299,7 +302,7 @@
                                 background-color: var(--controls-button-bg, #4287f5);
 
                                 & svg {
-                                        fill: var(--color, white);
+                                        color: var(--color, white);
                                 }
                         }
                 }

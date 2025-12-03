@@ -1,0 +1,16 @@
+
+                                <svg
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        style={{ "pointer-events": "none" }}
+                                >
+                                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                                        <circle cx="12" cy="12" r="2" />
+                                        <path d="M12 7v3" />
+                                        <path d="M12 14v3" />
+                                </svg>

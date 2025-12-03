@@ -10,7 +10,10 @@ export const ControlsView = (
         helper?: HelperType,
 ) => {
         return (
-                <div class="kit-controls">
+                <div
+                        class="kitx-controls"
+                        style={{ right: "10px", bottom: "10px" }}
+                >
                         <button
                                 onpointerdown={() =>
                                         props.kit.setFocus((prev) => !prev)
@@ -134,4 +137,3 @@ export const ControlsView = (
                 </div>
         );
 };
-

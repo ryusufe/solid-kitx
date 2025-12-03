@@ -48,7 +48,10 @@ const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
         };
 
         return (
-                <div class="kit-controls" style={{ "--flex-direction": "row" }}>
+                <div
+                        class="kitx-controls"
+                        style={{ "--flex-direction": "row" }}
+                >
                         <button onpointerdown={removeNode} title="Remove Node">
                                 <svg
                                         xmlns="http://www.w3.org/2000/svg"

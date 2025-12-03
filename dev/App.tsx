@@ -8,6 +8,7 @@ import ConnectionToolbar from "./components/ConnectionToolbar";
 import { createStore, unwrap } from "solid-js/store";
 import { SideBar } from "./components/SideBar";
 import { FieldsNode, FunctionNode, TaskNode } from "./components/NodeTypes";
+import { Glob } from "./Glob";
 //import "solid-kitx/index.css";
 
 interface DataType {
@@ -64,7 +65,6 @@ const App: Component = () => {
                                 onConnectionsChange={onConnectionsChange}
                                 viewportSignal={viewportSignal}
                                 onViewportChange={onViewportChange}
-                                defaultNode={defaultNode}
                                 components={{
                                         "node-toolbar": NodeToolbar,
                                         "connection-toolbar": ConnectionToolbar,
@@ -77,7 +77,11 @@ const App: Component = () => {
                                         <>
                                                 <BackgroundGrid
                                                         kit={kit}
-                                                        type="dash"
+                                                        type={
+                                                                Glob.backgroundType[0]() as
+                                                                        | "dot"
+                                                                        | "dash"
+                                                        }
                                                 />
                                                 <Selector kit={kit} />
                                                 <Controls kit={kit} />
@@ -85,60 +89,9 @@ const App: Component = () => {
                                         </>
                                 )}
                         </SolidKitx>
+                        <div id="external" />
                 </div>
         );
 };
-
-const defaultNode: Partial<NodeType> = {
-        width: 150,
-        height: 60,
-};
-
-// const data: DataType = {
-//         nodes: [
-//                 {
-//                         id: "node-1",
-//                         x: 390,
-//                         y: 300,
-//                         width: 210,
-//                         height: 300,
-//                         data: {
-//                                 label: "Color Changer",
-//                                 component: "example-status",
-//                         },
-//                         style: { "outline-color": "#272727" },
-//                 },
-//                 {
-//                         id: "node-2",
-//                         x: 120,
-//                         y: 120,
-//                         width: 150,
-//                         height: 60,
-//                         data: { label: "Node A" },
-//                 },
-//                 {
-//                         id: "node-3",
-//                         x: 870,
-//                         y: 150,
-//                         width: 600,
-//                         height: 720,
-//                         data: {
-//                                 label: "Example markdown",
-//                                 component: "example-markdown",
-//                         },
-//                 },
-//         ],
-//
-//         connections: [
-//                 {
-//                         id: "connection-1",
-//                         from: { id: "node-1", side: "left" },
-//                         to: { id: "node-2", side: "right" },
-//                         label: "Next",
-//                 },
-//         ],
-//         viewport: { x: 0, y: 0, zoom: 1 },
-//         gridSize: 30,
-// };
 
 render(() => <App />, document.getElementById("root")!);

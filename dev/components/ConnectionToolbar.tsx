@@ -38,7 +38,10 @@ const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
         };
 
         return (
-                <div class="kit-controls" style={{ "--flex-direction": "row" }}>
+                <div
+                        class="kitx-controls"
+                        style={{ "--flex-direction": "row" }}
+                >
                         <button onpointerdown={removeConnection}>
                                 <svg
                                         xmlns="http://www.w3.org/2000/svg"

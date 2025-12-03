@@ -70,8 +70,7 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
         return (
                 <div class="fields-node">
                         <div>
-                                <input
-                                        type="text"
+                                <textarea
                                         value={
                                                 props.node.data?.extra
                                                         ?.description ?? ""

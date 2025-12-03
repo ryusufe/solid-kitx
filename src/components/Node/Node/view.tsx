@@ -17,16 +17,16 @@ export const NodeView = (
                 <div
                         ref={state.nodeDiv}
                         class={`node ${props.node.class ?? ""} `}
-                        classList={{ selected: state.selected() }}
+                        classList={{
+                                selected: state.selected(),
+                                unfocus: !props.kit.focus(),
+                        }}
                         data-id={props.node.id}
                         on:pointerdown={logic.onPointerDown}
                         style={{
                                 transform: `translate(${props.node.x}px, ${props.node.y}px)`,
                                 width: `${props.node.width}px`,
                                 height: `${props.node.height}px`,
-                                "--node-cursor": props.kit.focus()
-                                        ? "auto"
-                                        : "grab",
                                 ...props.node.style,
                         }}
                 >

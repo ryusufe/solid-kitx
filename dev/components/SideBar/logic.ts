@@ -4,6 +4,7 @@ import type { HelperType } from "./helper";
 import { createEffect, on, onCleanup, onMount } from "solid-js";
 import { ConnectionType, NodeType, ViewPort } from "solid-kitx";
 import { unwrap } from "solid-js/store";
+import { Glob } from "../../Glob";
 
 interface Data {
         nodes: NodeType[];
@@ -14,6 +15,7 @@ export type LogicType = {
         clearAll: () => void;
         exportAll: () => void;
         importAll: () => void;
+        onBackgroundType: (s: string) => void;
 };
 
 export const SideBarLogic = (
@@ -96,11 +98,15 @@ export const SideBarLogic = (
                 input.click();
         };
 
+        const onBackgroundType = (s: string) => {
+                Glob.backgroundType[1](s);
+                localStorage.backgroundType = s;
+        };
         onMount(() => {
                 window.addEventListener("keydown", keydown);
         });
         onCleanup(() => {
                 window.removeEventListener("keydown", keydown);
         });
-        return { clearAll, exportAll, importAll };
+        return { clearAll, exportAll, importAll, onBackgroundType };
 };
