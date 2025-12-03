@@ -341,6 +341,7 @@ code {
         gap: 8px;
         padding: 6px 8px;
         background: rgba(0, 0, 0, 0.03);
+        position: relative;
         border-radius: 4px;
         font-size: 12px;
 }
@@ -426,11 +427,10 @@ code {
         padding: 4px 8px;
         background: rgba(26, 115, 232, 0.1);
         border-radius: 4px;
-        border-left: 3px solid #1a73e8;
 }
 
 .function-node .input-item .icon {
-        font-size: 12px;
+        font-size: 1em;
         color: #1a73e8;
 }
 
@@ -452,11 +452,10 @@ code {
         padding: 4px 8px;
         background: rgba(52, 168, 83, 0.1);
         border-radius: 4px;
-        border-left: 3px solid #34a853;
 }
 
 .function-node .output-item .icon {
-        font-size: 12px;
+        font-size: 1em;
         color: #34a853;
 }
 
@@ -482,7 +481,6 @@ code {
 
 .dark .function-node .input-item {
         background: rgba(88, 166, 255, 0.15);
-        border-left-color: #6D9EFF;
 }
 
 .dark .function-node .input-item .icon {
@@ -495,7 +493,6 @@ code {
 
 .dark .function-node .output-item {
         background: rgba(87, 171, 90, 0.15);
-        border-left-color: #57ab5a;
 }
 
 .dark .function-node .output-item .icon {

@@ -5,6 +5,8 @@ import {
         onMount,
         onCleanup,
         createEffect,
+        createMemo,
+        Show,
 } from "solid-js";
 import { Kit, NodeType } from "solid-kitx";
 
@@ -63,8 +65,6 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
                         "fields",
                         [...(props.node.data?.extra?.fields ?? []), ""],
                 );
-
-                setFocusIndex(newIndex);
         };
 
         return (
@@ -96,18 +96,28 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
                                         }
                                 >
                                         {(field, index) => {
+                                                const [value, setValue] =
+                                                        createSignal(field);
+                                                const rightPart = createMemo(
+                                                        () =>
+                                                                value().includes(
+                                                                        ":",
+                                                                ) &&
+                                                                value().split(
+                                                                        ":",
+                                                                )[1],
+                                                );
+                                                const focused = createMemo(
+                                                        () =>
+                                                                focusIndex() ===
+                                                                index(),
+                                                );
                                                 let inputRef!: HTMLInputElement;
 
                                                 createEffect(() => {
-                                                        if (
-                                                                focusIndex() ===
-                                                                index()
-                                                        ) {
+                                                        if (focused()) {
                                                                 inputRef?.focus();
                                                                 inputRef?.select();
-                                                                setFocusIndex(
-                                                                        null,
-                                                                );
                                                         }
                                                 });
 
@@ -119,8 +129,22 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
                                                                                 inputRef
                                                                         }
                                                                         type="text"
+                                                                        onfocus={() =>
+                                                                                setFocusIndex(
+                                                                                        index(),
+                                                                                )
+                                                                        }
+                                                                        onblur={() =>
+                                                                                setFocusIndex(
+                                                                                        null,
+                                                                                )
+                                                                        }
                                                                         value={
-                                                                                field
+                                                                                focused()
+                                                                                        ? value()
+                                                                                        : value().split(
+                                                                                                  ":",
+                                                                                          )[0]
                                                                         }
                                                                         onkeydown={(
                                                                                 e,
@@ -131,6 +155,15 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
                                                                                 )
                                                                                         addField();
                                                                         }}
+                                                                        oninput={(
+                                                                                e,
+                                                                        ) =>
+                                                                                setValue(
+                                                                                        e
+                                                                                                .currentTarget
+                                                                                                .value,
+                                                                                )
+                                                                        }
                                                                         onChange={(
                                                                                 e,
                                                                         ) => {
@@ -143,6 +176,33 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
                                                                                 props.kit.updateNodes();
                                                                         }}
                                                                 />
+                                                                <Show
+                                                                        when={
+                                                                                !focused() &&
+                                                                                rightPart()
+                                                                        }
+                                                                >
+                                                                        <div
+                                                                                style={{
+                                                                                        position: "absolute",
+                                                                                        right: 0,
+                                                                                        height: "100%",
+                                                                                        display: "flex",
+                                                                                        "align-items":
+                                                                                                "center",
+                                                                                        "padding-inline":
+                                                                                                "5px",
+                                                                                        background: "#1a73e8",
+                                                                                        color: "white",
+                                                                                }}
+                                                                        >
+                                                                                {
+                                                                                        field.split(
+                                                                                                ":",
+                                                                                        )[1]
+                                                                                }
+                                                                        </div>
+                                                                </Show>
                                                         </div>
                                                 );
                                         }}

@@ -25,7 +25,7 @@ export const SideBarHelper = (props: SideBarProps): HelperType => {
                         defaultWidth: 250,
                         defaultHeight: 160,
                         defaultData: {
-                                fields: ["field1", "field2"],
+                                fields: ["field1 : Type", "field2"],
                                 description: "Enter description here",
                         },
                         icon: TableIcon,

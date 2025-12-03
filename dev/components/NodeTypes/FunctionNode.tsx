@@ -67,7 +67,6 @@ const FunctionNode: Component<FunctionNodeProps> = (props) => {
         };
 
         const addInput = () => {
-                console.log("hi");
                 addItem("inputs", [
                         "new input",
                         ...(props.node.data?.extra?.inputs ?? []),

@@ -35,8 +35,13 @@
                         justify-content: center;
                         align-items: center;
 
-                        &.unfocus * {
-                                cursor: grab;
+
+                        &.unfocus {
+                                cursor: grab !important;
+
+                                & * {
+                                        pointer-events: none;
+                                }
                         }
 
                         .node-edge {
