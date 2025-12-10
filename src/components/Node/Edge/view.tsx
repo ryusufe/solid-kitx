@@ -30,6 +30,7 @@ export const EdgeView = (
                                 }
                         >
                                 <AnchorPoint
+                                        index={props?.index}
                                         side={props?.side as Position}
                                         kit={props?.kit!}
                                         id={props?.node.id!}

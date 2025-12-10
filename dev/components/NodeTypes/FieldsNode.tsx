@@ -7,6 +7,7 @@ import {
         createEffect,
         createMemo,
         Show,
+        Accessor,
 } from "solid-js";
 import { Kit, NodeType } from "solid-kitx";
 
@@ -18,6 +19,7 @@ interface FieldsData {
 interface FieldsNodeProps {
         node: NodeType<FieldsData>;
         kit: Kit;
+        index: Accessor<number>;
 }
 
 const FieldsNode: Component<FieldsNodeProps> = (props) => {
@@ -25,7 +27,7 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
 
         const handleDescriptionUpdate = (text: string) => {
                 props.kit.setNodes(
-                        (n: NodeType) => n.id === props.node.id,
+                        props.index(),
                         "data",
                         "extra",
                         "description",
@@ -36,7 +38,7 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
         const handleFieldUpdate = (index: number, newValue: string) => {
                 if (!newValue) {
                         props.kit.setNodes(
-                                (n: NodeType) => n.id === props.node.id,
+                                props.index(),
                                 "data",
                                 "extra",
                                 "fields",
@@ -46,7 +48,7 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
                         );
                 } else {
                         props.kit.setNodes(
-                                (n: NodeType) => n.id === props.node.id,
+                                props.index(),
                                 "data",
                                 "extra",
                                 "fields",
@@ -58,13 +60,10 @@ const FieldsNode: Component<FieldsNodeProps> = (props) => {
 
         const addField = () => {
                 const newIndex = props.node.data?.extra?.fields?.length ?? 0;
-                props.kit.setNodes(
-                        (n: NodeType) => n.id === props.node.id,
-                        "data",
-                        "extra",
-                        "fields",
-                        [...(props.node.data?.extra?.fields ?? []), ""],
-                );
+                props.kit.setNodes(props.index(), "data", "extra", "fields", [
+                        ...(props.node.data?.extra?.fields ?? []),
+                        "",
+                ]);
         };
 
         return (

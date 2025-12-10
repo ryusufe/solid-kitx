@@ -71,6 +71,7 @@ export const ConnectionView = (
                                                 component={props.Toolbar}
                                                 kit={props.kit}
                                                 connection={props.connection}
+                                                index={props.index}
                                         />
                                 </div>
                         </Show>

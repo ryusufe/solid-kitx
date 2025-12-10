@@ -1,3 +1,4 @@
+import { ConnectionType } from "./connection";
 import { NodeType } from "./node";
 
 export const configKeys = [
@@ -17,6 +18,8 @@ export const configKeys = [
         "disableKeyboardShortcuts",
         "disableHorizontalPan",
         "disableVerticalPan",
+        "filterNodes",
+        "filterConnections",
         // "enableHistory",
         // "historyLimit",
 ] as const;
@@ -31,7 +34,7 @@ export interface ConfigsType {
         // Dragging
         disableNodeDrag?: boolean;
         disableEdgeDrag?: boolean;
-        gridSize?: number;
+        gridSize: number;
 
         // Resizing
         minNodeWidth?: number;
@@ -57,4 +60,7 @@ export interface ConfigsType {
         // disallowOverlappingNodes?: boolean;
         disableHorizontalPan?: boolean;
         disableVerticalPan?: boolean;
+
+        filterNodes?: (n: NodeType) => boolean;
+        filterConnections?: (c: ConnectionType) => boolean;
 }

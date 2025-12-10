@@ -1,38 +1,31 @@
+import { Accessor } from "solid-js";
 import { reconcile } from "solid-js/store";
 import { ConnectionType, Kit, NodeType } from "solid-kitx";
 
-const ConnectionToolbar = (props: { kit: Kit; connection: ConnectionType }) => {
+const ConnectionToolbar = (props: {
+        kit: Kit;
+        connection: ConnectionType;
+        index: Accessor<number>;
+}) => {
         const changeLineColor = () => {
                 const input = document.createElement("input");
                 input.type = "color";
                 input.click();
                 input.addEventListener("input", () => {
                         props.kit.setConnections(
-                                reconcile(
-                                        props.kit.connections.map((c) =>
-                                                c.id === props.connection.id
-                                                        ? {
-                                                                  ...c,
-                                                                  style: {
-                                                                          ...c.style,
-                                                                          stroke: input.value,
-                                                                  },
-                                                          }
-                                                        : c,
-                                        ),
-                                ),
+                                props.index(),
+                                "style",
+                                "stroke",
+                                input.value,
                         );
                         props.kit.updateConnections();
                 });
         };
 
         const removeConnection = () => {
-                props.kit.setConnections(
-                        reconcile(
-                                props.kit.connections.filter(
-                                        (n) => n.id !== props.connection.id,
-                                ),
-                        ),
+                // TODO: tracker
+                props.kit.setConnections((prev) =>
+                        prev.filter((n) => n.id !== props.connection.id),
                 );
                 props.kit.updateConnections();
         };

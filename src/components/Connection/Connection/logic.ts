@@ -24,11 +24,7 @@ export const ConnectionLogic = (
         };
 
         const setLabel = (label?: string) => {
-                props.kit.setConnections(
-                        (c: ConnectionType) => c.id === props.connection.id,
-                        "label",
-                        label,
-                );
+                props.kit.setConnections(props.index(), "label", label);
                 props.kit.updateConnections();
         };
 

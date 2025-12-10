@@ -88,9 +88,8 @@ export const AnchorPointLogic = (
                                                 ...kit.configs.defaultNode,
                                                 id,
                                         };
-                                        kit.setNodes(
-                                                reconcile([...kit.nodes, node]),
-                                        );
+                                        // TODO: tracker | mid
+                                        kit.setNodes((prev) => [...prev, node]);
                                         kit.updateNodes(true);
 
                                         const fromSide =
@@ -109,12 +108,11 @@ export const AnchorPointLogic = (
                                         from: kit.activeConnection.from!,
                                         to: to as ConnectionNode,
                                 };
-                                kit.setConnections(
-                                        reconcile([
-                                                ...kit.connections,
-                                                connection,
-                                        ]),
-                                );
+                                // TODO: tracker
+                                kit.setConnections((prev) => [
+                                        ...prev,
+                                        connection,
+                                ]);
                                 kit.updateConnections();
                         }
                 }

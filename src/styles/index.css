@@ -36,7 +36,7 @@
                         align-items: center;
 
 
-                        &.unfocus {
+                        &.unfocus :not(.node-edge):not(.node-anchor) {
                                 cursor: grab !important;
 
                                 & * {

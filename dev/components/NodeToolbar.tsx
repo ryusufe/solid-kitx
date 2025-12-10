@@ -1,50 +1,38 @@
-import { createMemo, createSignal, Match, Switch } from "solid-js";
+import { Accessor, createMemo, createSignal, Match, Switch } from "solid-js";
 import { reconcile } from "solid-js/store";
 import { ConnectionType, Kit, NodeType } from "solid-kitx";
 
-const NodeToolbar = (props: { kit: Kit; node: NodeType }) => {
+const NodeToolbar = (props: {
+        kit: Kit;
+        node: NodeType;
+        index: Accessor<number>;
+}) => {
         const isTaskNode = createMemo(
                 () => props.node.data?.component === "task-node",
         );
         const removeNode = () => {
                 const n_id = props.node.id;
-                props.kit.setConnections(
-                        reconcile(
-                                props.kit.connections.filter(
-                                        (c) =>
-                                                c.from.id !== n_id &&
-                                                c.to.id !== n_id,
-                                ),
+                // TODO: tracker
+                props.kit.setConnections((prev) =>
+                        prev.filter(
+                                (c) => c.from.id !== n_id && c.to.id !== n_id,
                         ),
                 );
-                props.kit.setNodes(
-                        reconcile(props.kit.nodes.filter((n) => n.id !== n_id)),
-                );
+                // TODO: tracker
+                props.kit.setNodes((prev) => prev.filter((n) => n.id !== n_id));
                 props.kit.updateNodes();
         };
         const addField = () => {
-                props.kit.setNodes(
-                        (n: NodeType) => n.id === props.node.id,
-                        "data",
-                        "extra",
-                        "fields",
-                        [
-                                "new field",
-                                ...(props.node.data?.extra?.fields ?? []),
-                        ],
-                );
+                props.kit.setNodes(props.index(), "data", "extra", "fields", [
+                        "new field",
+                        ...(props.node.data?.extra?.fields ?? []),
+                ]);
         };
         const addTask = () => {
-                props.kit.setNodes(
-                        (n: NodeType) => n.id === props.node.id,
-                        "data",
-                        "extra",
-                        "tasks",
-                        [
-                                { description: "new task", done: false },
-                                ...props.node.data?.extra.tasks,
-                        ],
-                );
+                props.kit.setNodes(props.index(), "data", "extra", "tasks", [
+                        { description: "new task", done: false },
+                        ...props.node.data?.extra.tasks,
+                ]);
         };
 
         return (

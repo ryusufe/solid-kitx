@@ -63,13 +63,10 @@ export const NodeLogic = (
                         const x = startData.x + dx;
                         const y = startData.y + dy;
 
-                        props.kit.setNodes(
-                                (n: NodeType) => n.id === props.node.id,
-                                {
-                                        x,
-                                        y,
-                                },
-                        );
+                        props.kit.setNodes(props.index(), {
+                                x,
+                                y,
+                        });
                 },
                 onEnd: (_, startData) => {
                         if (
@@ -144,6 +141,7 @@ export const NodeLogic = (
                         window.removeEventListener("keydown", onKeyDown);
                 }
         };
+
         const onKeyDown = (e: KeyboardEvent) => {
                 if (e.key === "Escape") {
                         setSelected(false);

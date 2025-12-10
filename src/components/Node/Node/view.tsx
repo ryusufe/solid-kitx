@@ -51,6 +51,7 @@ export const NodeView = (
                                                 }
                                                 kit={props.kit}
                                                 node={props.node}
+                                                index={props.index}
                                         />
                                 </div>
                         </Show>
@@ -87,9 +88,7 @@ export const NodeView = (
                                                                           .innerText;
 
                                                 props.kit.setNodes(
-                                                        (n: NodeType) =>
-                                                                n.id ===
-                                                                props.node.id,
+                                                        props.index(),
                                                         "data",
                                                         "label",
                                                         value,
@@ -127,6 +126,7 @@ export const NodeView = (
                                                 }
                                                 node={props.node}
                                                 kit={props.kit}
+                                                index={props.index}
                                         />
                                 </div>
                         </Show>
@@ -146,6 +146,7 @@ export const NodeView = (
                         >
                                 {(side) => (
                                         <Edge
+                                                index={props.index}
                                                 side={side}
                                                 node={props.node}
                                                 kit={props.kit}

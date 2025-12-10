@@ -1,4 +1,4 @@
-import { Component, For } from "solid-js";
+import { Accessor, Component, For } from "solid-js";
 import { Kit, NodeType } from "solid-kitx";
 
 interface FunctionData {
@@ -9,13 +9,14 @@ interface FunctionData {
 interface FunctionNodeProps {
         node: NodeType<FunctionData>;
         kit: Kit;
+        index: Accessor<number>;
 }
 
 const FunctionNode: Component<FunctionNodeProps> = (props) => {
         const handlePropUpdate = (index: number, newValue: string) => {
                 if (!newValue) {
                         props.kit.setNodes(
-                                (n: NodeType) => n.id === props.node.id,
+                                props.index(),
                                 "data",
                                 "extra",
                                 "inputs",
@@ -25,7 +26,7 @@ const FunctionNode: Component<FunctionNodeProps> = (props) => {
                         );
                 } else {
                         props.kit.setNodes(
-                                (n: NodeType) => n.id === props.node.id,
+                                props.index(),
                                 "data",
                                 "extra",
                                 "inputs",
@@ -42,7 +43,7 @@ const FunctionNode: Component<FunctionNodeProps> = (props) => {
         const handleOutputUpdate = (index: number, newValue: string) => {
                 if (!newValue) {
                         props.kit.setNodes(
-                                (n: NodeType) => n.id === props.node.id,
+                                props.index(),
                                 "data",
                                 "extra",
                                 "outputs",
@@ -52,7 +53,7 @@ const FunctionNode: Component<FunctionNodeProps> = (props) => {
                         );
                 } else {
                         props.kit.setNodes(
-                                (n: NodeType) => n.id === props.node.id,
+                                props.index(),
                                 "data",
                                 "extra",
                                 "outputs",
@@ -79,13 +80,7 @@ const FunctionNode: Component<FunctionNodeProps> = (props) => {
                 ]);
         };
         const addItem = (type: "inputs" | "outputs", l: string[]) => {
-                props.kit.setNodes(
-                        (n: NodeType) => n.id === props.node.id,
-                        "data",
-                        "extra",
-                        type,
-                        l,
-                );
+                props.kit.setNodes(props.index(), "data", "extra", type, l);
                 props.kit.updateNodes();
         };
 

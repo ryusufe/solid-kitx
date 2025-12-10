@@ -6,9 +6,11 @@ import type { LogicType } from "./logic";
 import { EdgeView } from "./view";
 import { EdgeHelper, HelperType } from "./helper";
 import { Kit, NodeType, Position } from "src/types";
+import { Accessor } from "solid-js";
 
 export type EdgePosition = Position | "tr" | "tl" | "br" | "bl";
 export type EdgeProps = {
+        index: Accessor<number>;
         side: EdgePosition;
         node: NodeType;
         kit: Kit;

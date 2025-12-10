@@ -175,30 +175,25 @@ export const SolidKitxLogic = (
                 if (e.key === "Delete" && selection.length() > 0) {
                         const selectedConnections = selection.getConnections();
                         const selectedNodes = selection.getNodes();
-                        state.kit.setConnections(
-                                reconcile(
-                                        state.kit.connections.filter(
-                                                (c) =>
-                                                        !selectedConnections.includes(
-                                                                c.id,
-                                                        ) &&
-                                                        !selectedNodes.includes(
-                                                                c.from.id,
-                                                        ) &&
-                                                        !selectedNodes.includes(
-                                                                c.to.id,
-                                                        ),
-                                        ),
+                        // TODO: tracker
+                        state.kit.setConnections((prev) =>
+                                prev.filter(
+                                        (c) =>
+                                                !selectedConnections.includes(
+                                                        c.id,
+                                                ) &&
+                                                !selectedNodes.includes(
+                                                        c.from.id,
+                                                ) &&
+                                                !selectedNodes.includes(
+                                                        c.to.id,
+                                                ),
                                 ),
                         );
-                        state.kit.setNodes(
-                                reconcile(
-                                        state.kit.nodes.filter(
-                                                (n) =>
-                                                        !selectedNodes.includes(
-                                                                n.id,
-                                                        ),
-                                        ),
+                        // TODO: tracker
+                        state.kit.setNodes((prev) =>
+                                prev.filter(
+                                        (n) => !selectedNodes.includes(n.id),
                                 ),
                         );
                         selectedConnections.length > 0 &&

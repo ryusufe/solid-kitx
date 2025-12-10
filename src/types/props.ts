@@ -15,8 +15,16 @@ export interface SolidKitxProps extends ConfigsType {
         ];
         viewportSignal: Signal<ViewPort>;
         onViewportChange: (vp: ViewPort) => void;
-        onNodesChange: (nodes: NodeType[]) => void;
-        onConnectionsChange: (connections: ConnectionType[]) => void;
+        /**
+         * Fired when one or more nodes have changed.
+         * @param changedNodes Only the ids of the nodes that changed.
+         */
+        onNodesChange: (changedNodes?: string[]) => void;
+        /**
+         * Fired when one or more connections have changed.
+         * @param changedConnections Only the ids of the connections that changed.
+         */
+        onConnectionsChange: (changedConnections?: string[]) => void;
         width?: number;
         height?: number;
         class?: string;

@@ -1,13 +1,16 @@
 import { createEffect, createSignal, on, splitProps } from "solid-js";
-import { createStore, unwrap } from "solid-js/store";
+import { createStore, SetStoreFunction, unwrap } from "solid-js/store";
 import {
         type Kit,
         type SolidKitxProps,
         type ActiveConnectionType,
         xy,
+        NodeType,
+        ConnectionType,
 } from "../types";
 import { configKeys, ConfigsType } from "../types/configs";
 import { Selection } from "src/utils/selection";
+import { createTracker } from "src/utils/tracker";
 
 // interface History {
 //         nodes: NodeType[];
@@ -15,8 +18,17 @@ import { Selection } from "src/utils/selection";
 // }
 
 export const createKit = (props: SolidKitxProps): Kit => {
-        const [nodes, setNodes] = props.nodesStore;
-        const [connections, setConnections] = props.connectionsStore;
+        const [nodes, setNodesRaw] = props.nodesStore;
+        const [changedNodes, setNodes] = createTracker<NodeType>({
+                store: nodes,
+                setStore: setNodesRaw,
+        });
+        const [connections, setConnectionsRaw] = props.connectionsStore;
+        const [changedConnections, setConnections] =
+                createTracker<ConnectionType>({
+                        store: connections,
+                        setStore: setConnectionsRaw,
+                });
         const [viewport, setViewport] = props.viewportSignal;
 
         const [focus, setFocus] = createSignal(false);
@@ -28,7 +40,6 @@ export const createKit = (props: SolidKitxProps): Kit => {
 
         const randomId = (type: "connection" | "node") =>
                 type + "-" + Math.random().toString(36).substring(2, 10);
-
         // History
         // const [history, setHistory] = createSignal<History[]>([
         //         {
@@ -60,12 +71,14 @@ export const createKit = (props: SolidKitxProps): Kit => {
         //
         const updateNodes = (skipHistory?: boolean) => {
                 // !skipHistory && pushHistory();
-                props.onNodesChange(unwrap(nodes));
+                props.onNodesChange([...changedNodes]);
+                changedNodes.clear();
         };
 
         const updateConnections = (skipHistory?: boolean) => {
                 // !skipHistory && pushHistory();
-                props.onConnectionsChange(unwrap(connections));
+                props.onConnectionsChange([...changedConnections]);
+                changedConnections.clear();
         };
         //
         // const undo = () => {

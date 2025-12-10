@@ -7,12 +7,13 @@ import { ConnectionView } from "./view";
 import { ConnectionHelper } from "./helper";
 import type { HelperType } from "./helper";
 import { ConnectionToolbarProps, ConnectionType, Kit } from "src/types";
-import { Component } from "solid-js";
+import { Accessor, Component } from "solid-js";
 
 export type ConnectionProps = {
         connection: ConnectionType;
         Toolbar?: Component<ConnectionToolbarProps>;
         kit: Kit;
+        index: Accessor<number>;
 };
 
 export const Connection = createModule<
@@ -39,4 +40,3 @@ export const Connection = createModule<
                 };
         },
 });
-

@@ -1,4 +1,4 @@
-import { Component, createMemo, For, Show } from "solid-js";
+import { Accessor, Component, createMemo, For, Show } from "solid-js";
 import { Kit, NodeType } from "solid-kitx";
 
 interface TaskItem {
@@ -13,6 +13,7 @@ interface TaskData {
 interface TaskNodeProps {
         node: NodeType<TaskData>;
         kit: Kit;
+        index: Accessor<number>;
 }
 
 const TaskNode: Component<TaskNodeProps> = (props) => {
@@ -22,7 +23,7 @@ const TaskNode: Component<TaskNodeProps> = (props) => {
 
         const toggleDone = (index: number) => {
                 props.kit.setNodes(
-                        (n: NodeType) => n.id === props.node.id,
+                        props.index(),
                         "data",
                         "extra",
                         "tasks",
@@ -35,7 +36,7 @@ const TaskNode: Component<TaskNodeProps> = (props) => {
 
         const saveDescription = (index: number, newValue: string) => {
                 props.kit.setNodes(
-                        (n: NodeType) => n.id === props.node.id,
+                        props.index(),
                         "data",
                         "extra",
                         "tasks",

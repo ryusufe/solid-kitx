@@ -29,13 +29,13 @@ const App: Component = () => {
                 JSON.parse(localStorage.vp ?? '{ "x": 0, "y": 0, "zoom": 1 }'),
         );
 
-        const onNodesChange = () => {
-                console.log("nodes changed");
+        const onNodesChange = (changedIds?: string[]) => {
+                console.log("nodes changed: ", changedIds?.join(", "));
                 // save in db
                 localStorage.nodes = JSON.stringify(unwrap(nodesStore[0]));
         };
-        const onConnectionsChange = () => {
-                console.log("connections changed");
+        const onConnectionsChange = (changedIds?: string[]) => {
+                console.log("connections changed: ", changedIds?.join(", "));
                 // save in db
                 localStorage.connections = JSON.stringify(
                         unwrap(connectionsStore[0]),
@@ -65,6 +65,7 @@ const App: Component = () => {
                                 onConnectionsChange={onConnectionsChange}
                                 viewportSignal={viewportSignal}
                                 onViewportChange={onViewportChange}
+                                gridSize={1}
                                 components={{
                                         "node-toolbar": NodeToolbar,
                                         "connection-toolbar": ConnectionToolbar,
@@ -82,6 +83,7 @@ const App: Component = () => {
                                                                         | "dot"
                                                                         | "dash"
                                                         }
+                                                        absoluteGrid={100}
                                                 />
                                                 <Selector kit={kit} />
                                                 <Controls kit={kit} />

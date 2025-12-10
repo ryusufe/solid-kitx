@@ -6,8 +6,10 @@ import type { LogicType } from "./logic";
 import { AnchorPointView } from "./view";
 import { AnchorPointHelper, HelperType } from "./helper";
 import type { Kit, Position } from "src/types";
+import { Accessor } from "solid-js";
 
 export type AnchorPointProps = {
+        index: Accessor<number>;
         side: Position;
         kit: Kit;
         id: string;

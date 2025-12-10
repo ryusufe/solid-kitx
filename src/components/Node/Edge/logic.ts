@@ -166,15 +166,12 @@ export const EdgeLogic = (
                                 }
                         }
 
-                        props.kit.setNodes(
-                                (n: NodeType) => n.id === props.node.id,
-                                {
-                                        width,
-                                        height,
-                                        x,
-                                        y,
-                                },
-                        );
+                        props.kit.setNodes(props.index(), {
+                                width,
+                                height,
+                                x,
+                                y,
+                        });
                 },
 
                 onEnd: (_, startNode) => {

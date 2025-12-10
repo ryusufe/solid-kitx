@@ -35,8 +35,8 @@ export const SolidKitxView = (
                                         })`,
                                 }}
                         >
-                                <For each={state.kit.connections}>
-                                        {(connection) => (
+                                <For each={state.filteredConnections()}>
+                                        {(connection, index) => (
                                                 <Connection
                                                         connection={connection}
                                                         Toolbar={
@@ -46,6 +46,7 @@ export const SolidKitxView = (
                                                                 ]
                                                         }
                                                         kit={state.kit}
+                                                        index={index}
                                                 />
                                         )}
                                 </For>
@@ -56,10 +57,11 @@ export const SolidKitxView = (
                                         <Preview kit={state.kit} />
                                 </Show>
 
-                                <For each={state.kit.nodes}>
-                                        {(node) => (
+                                <For each={state.filteredNodes()}>
+                                        {(node, index) => (
                                                 <Node
                                                         node={node}
+                                                        index={index}
                                                         components={
                                                                 props.components
                                                         }

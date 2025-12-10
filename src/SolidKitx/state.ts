@@ -1,4 +1,10 @@
-import { Kit, SolidKitxProps, ViewPort } from "src/types";
+import {
+        ConnectionType,
+        Kit,
+        NodeType,
+        SolidKitxProps,
+        ViewPort,
+} from "src/types";
 import type { HelperType } from "./helper";
 import { createKit } from "src/core/createKit";
 import { Accessor, createMemo, JSX } from "solid-js";
@@ -8,6 +14,8 @@ export type StateType = {
         Children: () => JSX.Element;
         containerRef: HTMLDivElement;
         vp: Accessor<ViewPort>;
+        filteredNodes: Accessor<NodeType[]>;
+        filteredConnections: Accessor<ConnectionType[]>;
 };
 
 export const createSolidKitxState = (
@@ -20,7 +28,23 @@ export const createSolidKitxState = (
                 const c = props.children;
                 return typeof c === "function" ? c(kit) : c;
         };
-
         const vp = createMemo(() => kit.viewport());
-        return { kit, containerRef, Children, vp };
+        const filteredNodes = createMemo(() =>
+                props.filterNodes
+                        ? kit.nodes.filter(props.filterNodes)
+                        : kit.nodes,
+        );
+        const filteredConnections = createMemo(() =>
+                props.filterConnections
+                        ? kit.connections.filter(props.filterConnections)
+                        : kit.connections,
+        );
+        return {
+                kit,
+                containerRef,
+                Children,
+                vp,
+                filteredConnections,
+                filteredNodes,
+        };
 };

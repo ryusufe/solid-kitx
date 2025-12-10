@@ -134,6 +134,7 @@ const NodePreview = ({
                                 extra: selected.defaultData,
                         },
                 };
+                // TODO: tracker
                 kit.setNodes((prev) => [...prev, newNode]);
                 setSelected("");
                 kit.updateNodes();
